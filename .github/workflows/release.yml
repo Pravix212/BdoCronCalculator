@@ -1,0 +1,49 @@
+﻿name: Build and Release BDO Cron Calculator
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore BdoCronCalculator.csproj
+        working-directory: .
+
+      - name: Run Unit Tests
+        run: dotnet test BdoCronCalculator.Tests/BdoCronCalculator.Tests.csproj -c Release
+        working-directory: .
+
+      - name: Publish Standalone Portable Executable
+        run: |
+          dotnet publish BdoCronCalculator.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/
+        working-directory: .
+
+      - name: Create ZIP Package
+        run: |
+          Compress-Archive -Path publish/* -DestinationPath BdoCronCalculator-Portable.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            BdoCronCalculator-Portable.zip
+            publish/BdoCronCalculator.exe
+          generate_release_notes: true

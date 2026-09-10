@@ -1,0 +1,14 @@
+﻿## Build and Output Folders
+bin/
+obj/
+publish/
+Publish/
+*.user
+*.suo
+.vs/
+.idea/
+
+## Test Results
+TestResults/
+*.trx
+*.coverage

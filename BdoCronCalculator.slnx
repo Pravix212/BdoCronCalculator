@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BdoCronCalculator.csproj" />
+  <Project Path="BdoCronCalculator.Tests/BdoCronCalculator.Tests.csproj" />
+</Solution>
