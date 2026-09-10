@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -178,7 +179,15 @@ public partial class MainWindow : Window
                 OpacityValueLabel.Text = $"{(int)s.BackgroundOpacity}%";
         }
 
+        if (ButtonOpacitySlider != null)
+        {
+            ButtonOpacitySlider.Value = s.ButtonOpacity;
+            if (ButtonOpacityValueLabel != null)
+                ButtonOpacityValueLabel.Text = $"{(int)s.ButtonOpacity}%";
+        }
+
         ApplyBackgroundOpacity(s.BackgroundOpacity);
+        ApplyButtonOpacity(s.ButtonOpacity);
 
         var curVer = UpdateService.GetCurrentVersion();
         if (AppVersionLabel != null)
@@ -211,6 +220,26 @@ public partial class MainWindow : Window
 
         if (SettingsOverlay != null)
             SettingsOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
+    }
+
+    public void ApplyButtonOpacity(double opacityPercent)
+    {
+        double factor = Math.Clamp(opacityPercent / 100.0, 0.0, 1.0);
+        byte btnAlpha = (byte)(factor * 255);
+        byte hoverAlpha = (byte)Math.Min(255, factor * 255 + 40);
+        byte pressAlpha = (byte)Math.Max(0, factor * 255 - 20);
+
+        Application.Current.Resources["BgButton"] = new SolidColorBrush(Color.FromArgb(btnAlpha, 0x25, 0x2a, 0x32));
+        Application.Current.Resources["BgButtonHover"] = new SolidColorBrush(Color.FromArgb(hoverAlpha, 0x32, 0x38, 0x42));
+        Application.Current.Resources["BgButtonPressed"] = new SolidColorBrush(Color.FromArgb(pressAlpha, 0x1e, 0x22, 0x28));
+
+        Application.Current.Resources["BgOpButton"] = new SolidColorBrush(Color.FromArgb(btnAlpha, 0x20, 0x2b, 0x38));
+        Application.Current.Resources["BgOpButtonHover"] = new SolidColorBrush(Color.FromArgb(hoverAlpha, 0x28, 0x39, 0x4a));
+        Application.Current.Resources["BgOpButtonPressed"] = new SolidColorBrush(Color.FromArgb(pressAlpha, 0x19, 0x23, 0x2e));
+
+        Application.Current.Resources["BgCronButton"] = new SolidColorBrush(Color.FromArgb(btnAlpha, 0x12, 0x35, 0x45));
+        Application.Current.Resources["BgTaxButton"] = new SolidColorBrush(Color.FromArgb(btnAlpha, 0x2d, 0x22, 0x08));
+        Application.Current.Resources["BgEqualsButton"] = new SolidColorBrush(Color.FromArgb(btnAlpha, 0x00, 0x83, 0x8f));
     }
 
     private void UpdateSettingsRatesDisplay()
@@ -302,6 +331,18 @@ public partial class MainWindow : Window
         _engine.TaxSettings.Save();
     }
 
+    private void ButtonOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_isInitialized) return;
+
+        if (ButtonOpacityValueLabel != null)
+            ButtonOpacityValueLabel.Text = $"{(int)e.NewValue}%";
+
+        _engine.TaxSettings.ButtonOpacity = e.NewValue;
+        ApplyButtonOpacity(e.NewValue);
+        _engine.TaxSettings.Save();
+    }
+
     private void SettingsChanged(object sender, RoutedEventArgs e)
     {
         if (!_isInitialized || ValuePackCheckBox == null || MerchantRingCheckBox == null) return;
@@ -323,6 +364,69 @@ public partial class MainWindow : Window
             _engine.TaxSettings.Save();
             UpdateSettingsRatesDisplay();
         }
+    }
+    #endregion
+
+    #region Window Resizing Handlers
+    private void ResizeGripThumb_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (double.IsNaN(Width)) Width = ActualWidth;
+        if (double.IsNaN(Height)) Height = ActualHeight;
+
+        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
+        Height = Math.Max(MinHeight, Height + e.VerticalChange);
+    }
+
+    private void ResizeRight_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (double.IsNaN(Width)) Width = ActualWidth;
+        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
+    }
+
+    private void ResizeBottom_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (double.IsNaN(Height)) Height = ActualHeight;
+        Height = Math.Max(MinHeight, Height + e.VerticalChange);
+    }
+
+    private void ResizeLeft_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (double.IsNaN(Width)) Width = ActualWidth;
+        double newWidth = Math.Max(MinWidth, Width - e.HorizontalChange);
+        if (newWidth > MinWidth)
+        {
+            Left += e.HorizontalChange;
+            Width = newWidth;
+        }
+    }
+
+    private void ResizeTop_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        if (double.IsNaN(Height)) Height = ActualHeight;
+        double newHeight = Math.Max(MinHeight, Height - e.VerticalChange);
+        if (newHeight > MinHeight)
+        {
+            Top += e.VerticalChange;
+            Height = newHeight;
+        }
+    }
+
+    private void ResizeBottomLeft_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        ResizeLeft_DragDelta(sender, e);
+        ResizeBottom_DragDelta(sender, e);
+    }
+
+    private void ResizeTopRight_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        ResizeRight_DragDelta(sender, e);
+        ResizeTop_DragDelta(sender, e);
+    }
+
+    private void ResizeTopLeft_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        ResizeLeft_DragDelta(sender, e);
+        ResizeTop_DragDelta(sender, e);
     }
     #endregion
 

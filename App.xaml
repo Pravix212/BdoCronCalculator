@@ -14,6 +14,10 @@
         <SolidColorBrush x:Key="BgOpButtonHover" Color="#28394a" />
         <SolidColorBrush x:Key="BgOpButtonPressed" Color="#19232e" />
 
+        <SolidColorBrush x:Key="BgCronButton" Color="#123545" />
+        <SolidColorBrush x:Key="BgTaxButton" Color="#2d2208" />
+        <SolidColorBrush x:Key="BgEqualsButton" Color="#00838f" />
+
         <SolidColorBrush x:Key="AccentCron" Color="#00e5ff" />
         <SolidColorBrush x:Key="AccentCronGlow" Color="#184b55" />
         <SolidColorBrush x:Key="AccentCronHover" Color="#26eeff" />
@@ -25,7 +29,7 @@
 
         <!-- Standard Button Style -->
         <Style x:Key="CalcButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource BgButton}" />
+            <Setter Property="Background" Value="{DynamicResource BgButton}" />
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
             <Setter Property="BorderBrush" Value="{StaticResource BorderDark}" />
             <Setter Property="BorderThickness" Value="1" />
@@ -45,11 +49,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource BgButtonHover}" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BgButtonHover}" />
                                 <Setter TargetName="border" Property="BorderBrush" Value="#454f5f" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource BgButtonPressed}" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BgButtonPressed}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -59,7 +63,7 @@
 
         <!-- Operator Button Style -->
         <Style x:Key="OpButtonStyle" TargetType="Button" BasedOn="{StaticResource CalcButtonStyle}">
-            <Setter Property="Background" Value="{StaticResource BgOpButton}" />
+            <Setter Property="Background" Value="{DynamicResource BgOpButton}" />
             <Setter Property="Foreground" Value="{StaticResource AccentCron}" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -74,11 +78,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource BgOpButtonHover}" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BgOpButtonHover}" />
                                 <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentCron}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource BgOpButtonPressed}" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BgOpButtonPressed}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -88,7 +92,7 @@
 
         <!-- Equals Button Style -->
         <Style x:Key="EqualsButtonStyle" TargetType="Button" BasedOn="{StaticResource CalcButtonStyle}">
-            <Setter Property="Background" Value="#00838f" />
+            <Setter Property="Background" Value="{DynamicResource BgEqualsButton}" />
             <Setter Property="Foreground" Value="#ffffff" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Template">
@@ -117,7 +121,7 @@
 
         <!-- Cron Button Style -->
         <Style x:Key="CronButtonStyle" TargetType="Button" BasedOn="{StaticResource CalcButtonStyle}">
-            <Setter Property="Background" Value="#123545" />
+            <Setter Property="Background" Value="{DynamicResource BgCronButton}" />
             <Setter Property="Foreground" Value="{StaticResource AccentCron}" />
             <Setter Property="BorderBrush" Value="#00b4d8" />
             <Setter Property="FontWeight" Value="Bold" />
@@ -148,7 +152,7 @@
 
         <!-- Tax Button Style -->
         <Style x:Key="TaxButtonStyle" TargetType="Button" BasedOn="{StaticResource CalcButtonStyle}">
-            <Setter Property="Background" Value="#2d2208" />
+            <Setter Property="Background" Value="{DynamicResource BgTaxButton}" />
             <Setter Property="Foreground" Value="{StaticResource AccentGold}" />
             <Setter Property="BorderBrush" Value="#997300" />
             <Setter Property="FontWeight" Value="Bold" />

@@ -340,9 +340,37 @@
                     <Button Grid.Column="1" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+M (Mil)" ToolTip="Multiply by 1,000,000" Click="Multiply_M_Click" />
                     <Button Grid.Column="2" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+B (Bil)" ToolTip="Multiply by 1,000,000,000" Click="Multiply_B_Click" />
                     <Button Grid.Column="3" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="📋 Copy" ToolTip="Copy formatted result to clipboard" Click="Copy_Click" />
-                    <TextBlock Grid.Column="4" Text="⋰" FontSize="13" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="3,0,0,1" Cursor="SizeNWSE" ToolTip="Drag edge or corner to resize window" />
+                    
+                    <!-- Bottom-Right Resize Grip Thumb -->
+                    <Thumb x:Name="ResizeGripThumb"
+                           Grid.Column="4"
+                           Width="24"
+                           Height="24"
+                           Cursor="SizeNWSE"
+                           DragDelta="ResizeGripThumb_DragDelta"
+                           Background="Transparent"
+                           BorderThickness="0"
+                           ToolTip="Drag to resize window">
+                        <Thumb.Template>
+                            <ControlTemplate TargetType="Thumb">
+                                <Border Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <TextBlock Text="⋰" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,2,2" />
+                                </Border>
+                            </ControlTemplate>
+                        </Thumb.Template>
+                    </Thumb>
                 </Grid>
             </Border>
+
+            <!-- Edge & Corner Resize Handles (Full Window Perimeter) -->
+            <Thumb Grid.RowSpan="5" HorizontalAlignment="Right" Width="6" VerticalAlignment="Stretch" Cursor="SizeWE" DragDelta="ResizeRight_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" VerticalAlignment="Bottom" Height="6" HorizontalAlignment="Stretch" Cursor="SizeNS" DragDelta="ResizeBottom_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" HorizontalAlignment="Left" Width="6" VerticalAlignment="Stretch" Cursor="SizeWE" DragDelta="ResizeLeft_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" VerticalAlignment="Top" Height="6" HorizontalAlignment="Stretch" Cursor="SizeNS" DragDelta="ResizeTop_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="14" Height="14" Cursor="SizeNWSE" DragDelta="ResizeGripThumb_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="14" Height="14" Cursor="SizeNESW" DragDelta="ResizeBottomLeft_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" HorizontalAlignment="Right" VerticalAlignment="Top" Width="14" Height="14" Cursor="SizeNESW" DragDelta="ResizeTopRight_DragDelta" Background="Transparent" Opacity="0" />
+            <Thumb Grid.RowSpan="5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="14" Height="14" Cursor="SizeNWSE" DragDelta="ResizeTopLeft_DragDelta" Background="Transparent" Opacity="0" />
 
             <!-- 6. Settings Overlay View -->
             <Border x:Name="SettingsOverlay"
@@ -373,7 +401,7 @@
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <!-- Background Opacity / Transparency Setting -->
-                            <Border Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
+                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
                                 <StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -394,6 +422,31 @@
                                             LargeChange="10"
                                             Margin="0,8,0,0"
                                             ValueChanged="OpacitySlider_ValueChanged" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Button Opacity / Transparency Setting -->
+                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Button Opacity" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="13" />
+                                            <TextBlock Text="Button tiles transparency (0 - 100%)" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" x:Name="ButtonOpacityValueLabel" Text="90%" Foreground="{StaticResource AccentCron}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <Slider x:Name="ButtonOpacitySlider"
+                                            Minimum="0"
+                                            Maximum="100"
+                                            Value="90"
+                                            SmallChange="1"
+                                            LargeChange="10"
+                                            Margin="0,8,0,0"
+                                            ValueChanged="ButtonOpacitySlider_ValueChanged" />
                                 </StackPanel>
                             </Border>
 
