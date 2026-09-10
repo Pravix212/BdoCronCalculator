@@ -101,4 +101,67 @@ public sealed class CalculatorEngineTests
         string formatted = CalculatorEngine.FormatSilverSummary(value);
         Assert.Equal(expected, formatted);
     }
+
+    [Fact]
+    public void MarketTaxCalculation_MatchesGarmothBenchmark()
+    {
+        // Garmoth test case: 5 x 280,000,000 = 1,400,000,000 gross
+        // Settings: Value Pack (Yes), Rich Merchant Ring (No), Fame = 11,406 (+1.5%)
+        // Effective payout = 0.65 * (1 + 0.30 + 0.015) = 0.65 * 1.315 = 0.85475 (85.475%)
+        // Net profit = 1,400,000,000 * 0.85475 = 1,196,650,000
+        // Market tax = 1,400,000,000 - 1,196,650,000 = 203,350,000
+        var engine = new CalculatorEngine();
+        engine.TaxSettings = new MarketTaxSettings
+        {
+            HasValuePack = true,
+            HasMerchantRing = false,
+            FamilyFame = 11406
+        };
+
+        // Input 1,400,000,000
+        engine.InputDigit('1');
+        engine.InputDigit('4');
+        engine.MultiplyByThousand(100_000_000); // 1,400,000,000
+
+        Assert.Equal(1_400_000_000m, engine.CurrentValue);
+
+        // Click Tax Button
+        engine.CalculateMarketTax();
+
+        Assert.Equal(1_196_650_000m, engine.CurrentValue);
+        Assert.Contains("1.20 Billion Silver", engine.SilverSummary);
+        Assert.Equal("1,196,650,000", engine.FormattedDisplay);
+        Assert.Contains("14.53%", engine.ExpressionTape);
+    }
+
+    [Fact]
+    public void MarketTaxSettings_TierRatesAreAccurate()
+    {
+        var settings = new MarketTaxSettings();
+
+        // Base no buffs
+        settings.HasValuePack = false;
+        settings.HasMerchantRing = false;
+        settings.FamilyFame = 500;
+        Assert.Equal(0.65m, settings.EffectivePayoutRate);
+        Assert.Equal(0.35m, settings.EffectiveTaxRate);
+
+        // Tier 1 fame: 1000 - 3999 (+0.5%)
+        settings.FamilyFame = 2500;
+        Assert.Equal(0.005m, settings.GetFameBonusRate());
+        Assert.Equal(0.65m * 1.005m, settings.EffectivePayoutRate);
+
+        // Tier 2 fame: 4000 - 6999 (+1.0%)
+        settings.FamilyFame = 5000;
+        Assert.Equal(0.010m, settings.GetFameBonusRate());
+
+        // Tier 3 fame: >= 7000 (+1.5%) + Value Pack (+30%) + Merchant Ring (+5%)
+        settings.FamilyFame = 9000;
+        settings.HasValuePack = true;
+        settings.HasMerchantRing = true;
+        Assert.Equal(0.015m, settings.GetFameBonusRate());
+        Assert.Equal(0.365m, settings.TaxBonusRate);
+        Assert.Equal(0.65m * 1.365m, settings.EffectivePayoutRate); // 88.725%
+        Assert.Equal(0.11275m, settings.EffectiveTaxRate); // 11.275%
+    }
 }

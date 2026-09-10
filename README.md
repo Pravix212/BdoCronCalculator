@@ -15,6 +15,14 @@ A lightweight, always-on-top desktop calculator built for Black Desert Online pl
 - **Vendor Crons (`CRON 3M`)**: Calculates direct purchase cost from the NPC Blacksmith at 3,000,000 silver per stone.
 - **Outfit Extraction (`Outfit 2.18M`)**: Calculates effective cost when extracting Cron Stones from Central Market Pearl Outfits (~2,180,000 silver per stone).
 
+### Central Market Tax Calculator
+- **Net Silver Calculation (`💰 Tax`)**: Instantly calculates post-tax silver earnings for sold items.
+- **Configurable Tax Settings (`⚙`)**:
+  - **Value Pack**: Toggle +30% silver collection bonus (base retention goes from 65% to 84.5%).
+  - **Rich Merchant's Ring**: Toggle +5% market silver bonus.
+  - **Family Fame**: Configurable Fame points with automatic tier bonus calculation (+0.0% to +1.5%).
+  - Live readout of effective payout rate (e.g., 85.48%) and net tax percentage.
+
 ### Currency Readout
 - Automatically converts large numbers into formatted currency text:
   - `4,050,000,000` $\rightarrow$ `4.05 Billion Silver (4,050 M)`
@@ -37,8 +45,9 @@ A lightweight, always-on-top desktop calculator built for Black Desert Online pl
 | `+`, `-`, `*`, `/` | Basic arithmetic operators |
 | `Enter` / `=` | Calculate result |
 | `Backspace` | Remove last character |
-| `Escape` / `Delete` | Clear all (`C`) |
+| `Escape` / `Delete` | Clear all (`C`) or dismiss settings overlay |
 | `C` | Execute Vendor Cron calculation (`3M`) |
+| `T` | Execute Central Market Tax calculation |
 | `K` | Multiply current value by 1,000 (`k`) |
 | `M` | Multiply current value by 1,000,000 (`M`) |
 | `B` | Multiply current value by 1,000,000,000 (`B`) |

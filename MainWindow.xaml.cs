@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,7 +13,39 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        LoadSettingsIntoUI();
         UpdateUI();
+    }
+
+    private void LoadSettingsIntoUI()
+    {
+        var s = _engine.TaxSettings;
+        ValuePackCheckBox.IsChecked = s.HasValuePack;
+        MerchantRingCheckBox.IsChecked = s.HasMerchantRing;
+        FamilyFameTextBox.Text = s.FamilyFame.ToString();
+        UpdateSettingsRatesDisplay();
+    }
+
+    private void UpdateSettingsRatesDisplay()
+    {
+        var s = _engine.TaxSettings;
+        decimal payoutPct = s.EffectivePayoutRate * 100m;
+        decimal taxPct = s.EffectiveTaxRate * 100m;
+        decimal fameBonus = s.GetFameBonusRate() * 100m;
+
+        SettingsPayoutRateText.Text = $"{payoutPct:N2}%";
+        SettingsTaxRateText.Text = $"-{taxPct:N2}%";
+
+        if (s.FamilyFame >= 7000)
+            FameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
+        else if (s.FamilyFame >= 4000)
+            FameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
+        else if (s.FamilyFame >= 1000)
+            FameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
+        else
+            FameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
+
+        TaxButton.ToolTip = $"Calculate Market Net Profit ({payoutPct:N2}% Payout | -{taxPct:N2}% Tax)";
     }
 
     private void UpdateUI()
@@ -39,6 +71,44 @@ public partial class MainWindow : Window
         SilverSummaryText.Text = _engine.SilverSummary;
     }
 
+    #region Settings Management
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        SettingsOverlay.Visibility = SettingsOverlay.Visibility == Visibility.Visible
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+    }
+
+    private void CloseSettings_Click(object sender, RoutedEventArgs e)
+    {
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+        _engine.TaxSettings.Save();
+    }
+
+    private void SettingsChanged(object sender, RoutedEventArgs e)
+    {
+        if (ValuePackCheckBox == null || MerchantRingCheckBox == null) return;
+
+        _engine.TaxSettings.HasValuePack = ValuePackCheckBox.IsChecked == true;
+        _engine.TaxSettings.HasMerchantRing = MerchantRingCheckBox.IsChecked == true;
+        _engine.TaxSettings.Save();
+
+        UpdateSettingsRatesDisplay();
+    }
+
+    private void FamilyFameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (FamilyFameTextBox == null) return;
+
+        if (int.TryParse(FamilyFameTextBox.Text, out int fame) && fame >= 0)
+        {
+            _engine.TaxSettings.FamilyFame = fame;
+            _engine.TaxSettings.Save();
+            UpdateSettingsRatesDisplay();
+        }
+    }
+    #endregion
+
     #region Window Titlebar Controls
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
@@ -54,12 +124,12 @@ public partial class MainWindow : Window
         if (Topmost)
         {
             PinIcon.Foreground = (SolidColorBrush)FindResource("AccentCron");
-            PinButton.ToolTip = "Always on Top: Enabled";
+            PinButton.ToolTip = "Always on Top (Enabled)";
         }
         else
         {
             PinIcon.Foreground = (SolidColorBrush)FindResource("TextSecondary");
-            PinButton.ToolTip = "Always on Top: Disabled";
+            PinButton.ToolTip = "Always on Top (Disabled)";
         }
     }
 
@@ -108,6 +178,12 @@ public partial class MainWindow : Window
     private void OutfitCronButton_Click(object sender, RoutedEventArgs e)
     {
         _engine.CalculateCronCost(CalculatorEngine.OutfitExtractionCronPrice);
+        UpdateUI();
+    }
+
+    private void TaxButton_Click(object sender, RoutedEventArgs e)
+    {
+        _engine.CalculateMarketTax();
         UpdateUI();
     }
 
@@ -239,7 +315,17 @@ public partial class MainWindow : Window
                 _engine.Backspace();
                 break;
 
-            case Key.Escape or Key.Delete:
+            case Key.Escape:
+                if (SettingsOverlay.Visibility == Visibility.Visible)
+                {
+                    SettingsOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    return;
+                }
+                _engine.Clear();
+                break;
+
+            case Key.Delete:
                 _engine.Clear();
                 break;
 
@@ -251,6 +337,11 @@ public partial class MainWindow : Window
                 break;
             case Key.B:
                 _engine.MultiplyByThousand(1_000_000_000);
+                break;
+
+            case Key.T when Keyboard.Modifiers == ModifierKeys.None:
+                // Pressing T triggers Tax calculation!
+                _engine.CalculateMarketTax();
                 break;
 
             case Key.C when Keyboard.Modifiers == ModifierKeys.None:

@@ -1,7 +1,80 @@
-using System;
+﻿using System;
 using System.Globalization;
+using System.IO;
+using System.Text.Json;
 
 namespace BdoCronCalculator;
+
+public class MarketTaxSettings
+{
+    public bool HasValuePack { get; set; } = true;
+    public bool HasMerchantRing { get; set; } = false;
+    public int FamilyFame { get; set; } = 7000;
+
+    public decimal GetFameBonusRate()
+    {
+        if (FamilyFame >= 7000) return 0.015m;
+        if (FamilyFame >= 4000) return 0.010m;
+        if (FamilyFame >= 1000) return 0.005m;
+        return 0.0m;
+    }
+
+    public decimal TaxBonusRate =>
+        (HasValuePack ? 0.30m : 0.0m) +
+        (HasMerchantRing ? 0.05m : 0.0m) +
+        GetFameBonusRate();
+
+    public decimal EffectivePayoutRate => 0.65m * (1.0m + TaxBonusRate);
+
+    public decimal EffectiveTaxRate => 1.0m - EffectivePayoutRate;
+
+    public static string GetSettingsFilePath()
+    {
+        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BdoCronCalculator");
+        return Path.Combine(folder, "tax_settings.json");
+    }
+
+    public void Save()
+    {
+        try
+        {
+            string path = GetSettingsFilePath();
+            string? dir = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            string json = JsonSerializer.Serialize(this);
+            File.WriteAllText(path, json);
+        }
+        catch
+        {
+            // Ignore persistence errors on sandboxed mobile
+        }
+    }
+
+    public static MarketTaxSettings Load()
+    {
+        try
+        {
+            string path = GetSettingsFilePath();
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                var settings = JsonSerializer.Deserialize<MarketTaxSettings>(json);
+                if (settings != null)
+                {
+                    return settings;
+                }
+            }
+        }
+        catch
+        {
+            // Ignore fallback
+        }
+        return new MarketTaxSettings();
+    }
+}
 
 public class CalculatorEngine
 {
@@ -13,6 +86,22 @@ public class CalculatorEngine
     private string? _pendingOperator = null;
     private bool _isNewEntry = true;
     private string _currentInput = "0";
+    private MarketTaxSettings _taxSettings;
+
+    public CalculatorEngine()
+    {
+        _taxSettings = MarketTaxSettings.Load();
+    }
+
+    public MarketTaxSettings TaxSettings
+    {
+        get => _taxSettings;
+        set
+        {
+            _taxSettings = value ?? new MarketTaxSettings();
+            _taxSettings.Save();
+        }
+    }
 
     public decimal CurrentCronPrice
     {
@@ -136,6 +225,21 @@ public class CalculatorEngine
 
         ExpressionTape = $"{count.ToString("N0", CultureInfo.InvariantCulture)} Crons × {price.ToString("N0", CultureInfo.InvariantCulture)} =";
         _currentInput = totalSilver.ToString(CultureInfo.InvariantCulture);
+        _storedOperand = null;
+        _pendingOperator = null;
+        _isNewEntry = true;
+    }
+
+    public void CalculateMarketTax()
+    {
+        decimal gross = CurrentValue;
+        decimal payoutRate = _taxSettings.EffectivePayoutRate;
+        decimal netProfit = Math.Round(gross * payoutRate, MidpointRounding.AwayFromZero);
+        decimal taxAmount = gross - netProfit;
+        decimal taxPercent = _taxSettings.EffectiveTaxRate * 100m;
+
+        ExpressionTape = $"{gross.ToString("N0", CultureInfo.InvariantCulture)} - Tax ({taxPercent.ToString("N2", CultureInfo.InvariantCulture)}%) =";
+        _currentInput = netProfit.ToString(CultureInfo.InvariantCulture);
         _storedOperand = null;
         _pendingOperator = null;
         _isNewEntry = true;

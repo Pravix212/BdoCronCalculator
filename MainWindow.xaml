@@ -1,4 +1,4 @@
-﻿<Window x:Class="BdoCronCalculator.MainWindow"
+<Window x:Class="BdoCronCalculator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="BDO Cron Calculator"
@@ -50,6 +50,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Icon -->
@@ -66,8 +67,22 @@
                         <TextBlock Text="Cron Calculator" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FontSize="13" />
                     </StackPanel>
 
-                    <!-- Always-on-Top Pin Button -->
+                    <!-- Settings Button -->
                     <Button Grid.Column="2"
+                            x:Name="SettingsButton"
+                            Width="30"
+                            Height="26"
+                            Margin="2,0"
+                            Click="SettingsButton_Click"
+                            ToolTip="Central Market Tax Settings"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand">
+                        <TextBlock Text="⚙" FontSize="14" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Button>
+
+                    <!-- Always-on-Top Pin Button -->
+                    <Button Grid.Column="3"
                             x:Name="PinButton"
                             Width="30"
                             Height="26"
@@ -81,7 +96,7 @@
                     </Button>
 
                     <!-- Minimize Button -->
-                    <Button Grid.Column="3"
+                    <Button Grid.Column="4"
                             Width="30"
                             Height="26"
                             Margin="2,0"
@@ -95,7 +110,7 @@
                             Cursor="Hand" />
 
                     <!-- Close Button -->
-                    <Button Grid.Column="4"
+                    <Button Grid.Column="5"
                             Width="30"
                             Height="26"
                             Margin="2,0"
@@ -165,13 +180,15 @@
                 </Grid>
             </Border>
 
-            <!-- 3. Cron Action Bar -->
-            <Border Grid.Row="2" Background="{StaticResource BgPanel}" Padding="8,6" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
+            <!-- 3. Cron & Market Tax Action Bar -->
+            <Border Grid.Row="2" Background="{StaticResource BgPanel}" Padding="6,6" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1.2*" />
+                        <ColumnDefinition Width="6" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="6" />
+                        <ColumnDefinition Width="0.9*" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Main Vendor Cron Button (3,000,000) -->
@@ -180,18 +197,26 @@
                             Click="CronButton_Click"
                             ToolTip="Multiply by 3,000,000 (Vendor Cron Stone Price)">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="cronstone.png" Width="20" Height="20" Margin="0,0,8,0" VerticalAlignment="Center" />
-                            <TextBlock Text="CRON (3M)" FontSize="13" FontWeight="Bold" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" />
+                            <Image Source="cronstone.png" Width="18" Height="18" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBlock Text="CRON" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
 
                     <!-- Outfit Extraction Cron Button (2.18M) -->
                     <Button Grid.Column="2"
                             Style="{StaticResource CalcButtonStyle}"
-                            Padding="10,0"
                             Click="OutfitCronButton_Click"
                             ToolTip="Multiply by 2,180,000 (Outfit Extraction Cron Price)">
-                        <TextBlock Text="Outfit (2.18M)" FontSize="12" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        <TextBlock Text="Outfit (2.18M)" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                    </Button>
+
+                    <!-- Market Tax Calculator Button -->
+                    <Button Grid.Column="4"
+                            x:Name="TaxButton"
+                            Style="{StaticResource TaxButtonStyle}"
+                            Click="TaxButton_Click"
+                            ToolTip="Calculate Net Market Silver after Tax &amp; Bonuses">
+                        <TextBlock Text="💰 Tax" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center" />
                     </Button>
                 </Grid>
             </Border>
@@ -257,6 +282,129 @@
                     <Button Grid.Column="1" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+M (Mil)" ToolTip="Multiply by 1,000,000" Click="Multiply_M_Click" />
                     <Button Grid.Column="2" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+B (Bil)" ToolTip="Multiply by 1,000,000,000" Click="Multiply_B_Click" />
                     <Button Grid.Column="3" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="📋 Copy" ToolTip="Copy formatted result to clipboard" Click="Copy_Click" />
+                </Grid>
+            </Border>
+
+            <!-- 6. Settings Overlay View -->
+            <Border x:Name="SettingsOverlay"
+                    Grid.Row="1"
+                    Grid.RowSpan="4"
+                    Background="#131518"
+                    Visibility="Collapsed"
+                    CornerRadius="0,0,10,10"
+                    BorderBrush="{StaticResource BorderDark}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Settings Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="⚙ " FontSize="14" Foreground="{StaticResource AccentGold}" />
+                            <TextBlock Text="Central Market Tax Settings" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Settings Body -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- Value Pack Setting -->
+                            <Border Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Value Pack" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="13" />
+                                        <TextBlock Text="+30% Silver Collection bonus" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" x:Name="ValuePackCheckBox" IsChecked="True" Checked="SettingsChanged" Unchecked="SettingsChanged" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- Rich Merchant Ring Setting -->
+                            <Border Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Rich Merchant's Ring" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="13" />
+                                        <TextBlock Text="+5% Market Silver bonus" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" x:Name="MerchantRingCheckBox" IsChecked="False" Checked="SettingsChanged" Unchecked="SettingsChanged" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- Family Fame Setting -->
+                            <Border Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Family Fame" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="13" />
+                                            <TextBlock x:Name="FameBonusLabel" Text="+1.5% (≥ 7,000 Fame)" Foreground="{StaticResource AccentCron}" FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <TextBox Grid.Column="1"
+                                                 x:Name="FamilyFameTextBox"
+                                                 Width="85"
+                                                 Height="28"
+                                                 Text="7000"
+                                                 Background="#101215"
+                                                 Foreground="{StaticResource TextPrimary}"
+                                                 BorderBrush="{StaticResource BorderDark}"
+                                                 VerticalContentAlignment="Center"
+                                                 HorizontalContentAlignment="Right"
+                                                 FontSize="13"
+                                                 FontWeight="SemiBold"
+                                                 Padding="4,0"
+                                                 TextChanged="FamilyFameTextBox_TextChanged" />
+                                    </Grid>
+                                    <TextBlock Text="Tiers: 1k (+0.5%) | 4k (+1.0%) | 7k+ (+1.5%)" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,6,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Live Rates Card -->
+                            <Border Background="#1b2028" BorderBrush="{StaticResource AccentGold}" BorderThickness="1" CornerRadius="8" Padding="12,10">
+                                <StackPanel>
+                                    <TextBlock Text="CURRENT MARKET RATES" FontWeight="Bold" Foreground="{StaticResource AccentGold}" FontSize="11" />
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Payout Rate:" Foreground="{StaticResource TextSecondary}" FontSize="11" />
+                                            <TextBlock x:Name="SettingsPayoutRateText" Text="85.48%" Foreground="#4caf50" FontSize="16" FontWeight="Bold" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                            <TextBlock Text="Market Tax:" Foreground="{StaticResource TextSecondary}" FontSize="11" />
+                                            <TextBlock x:Name="SettingsTaxRateText" Text="-14.52%" Foreground="#ff5252" FontSize="16" FontWeight="Bold" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Done Button -->
+                    <Button Grid.Row="2"
+                            Style="{StaticResource EqualsButtonStyle}"
+                            Height="38"
+                            Margin="0,10,0,0"
+                            Content="Done &amp; Save Settings"
+                            FontSize="13"
+                            Click="CloseSettings_Click" />
                 </Grid>
             </Border>
         </Grid>

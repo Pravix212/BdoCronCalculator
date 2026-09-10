@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Devices;
+using Microsoft.Maui.Devices;
 
 namespace BdoCronCalculator.Mobile;
 
@@ -9,7 +9,36 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+        LoadSettingsIntoUI();
         UpdateUI();
+    }
+
+    private void LoadSettingsIntoUI()
+    {
+        var s = _engine.TaxSettings;
+        ValuePackSwitch.IsToggled = s.HasValuePack;
+        MerchantRingSwitch.IsToggled = s.HasMerchantRing;
+        FamilyFameEntry.Text = s.FamilyFame.ToString();
+        UpdateSettingsRatesDisplay();
+    }
+
+    private void UpdateSettingsRatesDisplay()
+    {
+        var s = _engine.TaxSettings;
+        decimal payoutPct = s.EffectivePayoutRate * 100m;
+        decimal taxPct = s.EffectiveTaxRate * 100m;
+
+        MobilePayoutRateLabel.Text = $"{payoutPct:N2}%";
+        MobileTaxRateLabel.Text = $"-{taxPct:N2}%";
+
+        if (s.FamilyFame >= 7000)
+            MobileFameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
+        else if (s.FamilyFame >= 4000)
+            MobileFameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
+        else if (s.FamilyFame >= 1000)
+            MobileFameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
+        else
+            MobileFameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
     }
 
     private void UpdateUI()
@@ -45,6 +74,44 @@ public partial class MainPage : ContentPage
             // Ignore on platforms without haptic support
         }
     }
+
+    #region Settings Management
+    private void OnSettingsClicked(object sender, EventArgs e)
+    {
+        TriggerHaptic();
+        SettingsOverlay.IsVisible = !SettingsOverlay.IsVisible;
+    }
+
+    private void OnCloseSettingsClicked(object sender, EventArgs e)
+    {
+        TriggerHaptic();
+        SettingsOverlay.IsVisible = false;
+        _engine.TaxSettings.Save();
+    }
+
+    private void OnSettingToggled(object sender, ToggledEventArgs e)
+    {
+        if (ValuePackSwitch == null || MerchantRingSwitch == null) return;
+
+        _engine.TaxSettings.HasValuePack = ValuePackSwitch.IsToggled;
+        _engine.TaxSettings.HasMerchantRing = MerchantRingSwitch.IsToggled;
+        _engine.TaxSettings.Save();
+
+        UpdateSettingsRatesDisplay();
+    }
+
+    private void OnFamilyFameTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (FamilyFameEntry == null) return;
+
+        if (int.TryParse(FamilyFameEntry.Text, out int fame) && fame >= 0)
+        {
+            _engine.TaxSettings.FamilyFame = fame;
+            _engine.TaxSettings.Save();
+            UpdateSettingsRatesDisplay();
+        }
+    }
+    #endregion
 
     private void OnDigitClicked(object sender, EventArgs e)
     {
@@ -84,6 +151,13 @@ public partial class MainPage : ContentPage
     {
         TriggerHaptic();
         _engine.CalculateCronCost(CalculatorEngine.OutfitExtractionCronPrice);
+        UpdateUI();
+    }
+
+    private void OnTaxClicked(object sender, EventArgs e)
+    {
+        TriggerHaptic();
+        _engine.CalculateMarketTax();
         UpdateUI();
     }
 

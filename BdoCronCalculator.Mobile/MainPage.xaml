@@ -7,12 +7,21 @@
     <Grid RowDefinitions="Auto, Auto, Auto, *, Auto" Padding="12, 16, 12, 16" RowSpacing="10">
         
         <!-- 1. Header Bar -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" VerticalOptions="Center" Margin="4, 0, 4, 4">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center" Margin="4, 0, 4, 4">
             <Image Grid.Column="0" Source="cronstone.png" WidthRequest="26" HeightRequest="26" Margin="0,0,8,0" VerticalOptions="Center" />
             <HorizontalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
                 <Label Text="BDO" FontAttributes="Bold" TextColor="#00e5ff" FontSize="18" VerticalOptions="Center" />
                 <Label Text="Cron Calculator" FontAttributes="Bold" TextColor="#f0f3f6" FontSize="18" VerticalOptions="Center" />
             </HorizontalStackLayout>
+            <Button Grid.Column="2"
+                    Text="⚙"
+                    FontSize="18"
+                    TextColor="#8a94a2"
+                    BackgroundColor="Transparent"
+                    BorderWidth="0"
+                    Padding="6, 0"
+                    HeightRequest="36"
+                    Clicked="OnSettingsClicked" />
         </Grid>
 
         <!-- 2. Display Section -->
@@ -45,31 +54,43 @@
             </VerticalStackLayout>
         </Border>
 
-        <!-- 3. Cron Buttons Row -->
-        <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="8">
+        <!-- 3. Cron & Tax Action Buttons Row -->
+        <Grid Grid.Row="2" ColumnDefinitions="1.1*, 1.1*, 0.9*" ColumnSpacing="6">
             <Button Grid.Column="0"
                     Text="CRON (3M)"
                     FontAttributes="Bold"
-                    FontSize="14"
+                    FontSize="12"
                     TextColor="#00e5ff"
                     BackgroundColor="#123545"
                     BorderColor="#00b4d8"
                     BorderWidth="1.5"
                     CornerRadius="8"
-                    HeightRequest="48"
+                    HeightRequest="44"
                     Clicked="OnCronClicked" />
 
             <Button Grid.Column="1"
                     Text="Outfit (2.18M)"
                     FontAttributes="Bold"
-                    FontSize="14"
+                    FontSize="12"
                     TextColor="#f0f3f6"
                     BackgroundColor="#252a32"
                     BorderColor="#2d333d"
                     BorderWidth="1"
                     CornerRadius="8"
-                    HeightRequest="48"
+                    HeightRequest="44"
                     Clicked="OnOutfitCronClicked" />
+
+            <Button Grid.Column="2"
+                    Text="💰 Tax"
+                    FontAttributes="Bold"
+                    FontSize="13"
+                    TextColor="#ffc107"
+                    BackgroundColor="#2d2208"
+                    BorderColor="#997300"
+                    BorderWidth="1.5"
+                    CornerRadius="8"
+                    HeightRequest="44"
+                    Clicked="OnTaxClicked" />
         </Grid>
 
         <!-- 4. Keypad Grid -->
@@ -112,6 +133,104 @@
             <Button Grid.Column="2" Text="+B" TextColor="#f0f3f6" BackgroundColor="#1c1f24" BorderColor="#2d333d" BorderWidth="1" CornerRadius="6" FontSize="13" HeightRequest="40" Clicked="OnMultiplyBClicked" />
             <Button Grid.Column="3" Text="📋 Copy" TextColor="#f0f3f6" BackgroundColor="#1c1f24" BorderColor="#2d333d" BorderWidth="1" CornerRadius="6" FontSize="13" HeightRequest="40" Clicked="OnCopyClicked" />
         </Grid>
+
+        <!-- 6. Settings Modal Overlay -->
+        <Border x:Name="SettingsOverlay"
+                Grid.Row="1"
+                Grid.RowSpan="4"
+                BackgroundColor="#131518"
+                Stroke="#2d333d"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12"
+                Padding="16"
+                IsVisible="False"
+                ZIndex="100">
+            <Grid RowDefinitions="Auto, *, Auto" RowSpacing="12">
+                <!-- Header -->
+                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                    <Label Grid.Column="0" Text="⚙ Market Tax Settings" TextColor="#ffc107" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="✕" TextColor="#ff5252" BackgroundColor="Transparent" FontSize="16" Padding="6, 0" HeightRequest="32" Clicked="OnCloseSettingsClicked" />
+                </Grid>
+
+                <!-- Body -->
+                <ScrollView Grid.Row="1">
+                    <VerticalStackLayout Spacing="10">
+                        <!-- Value Pack -->
+                        <Border BackgroundColor="#1c1f24" Stroke="#2d333d" StrokeShape="RoundRectangle 8" Padding="12, 10">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="Value Pack" TextColor="#f0f3f6" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="+30% Silver Collection bonus" TextColor="#8a94a2" FontSize="11" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" x:Name="ValuePackSwitch" IsToggled="True" Toggled="OnSettingToggled" OnColor="#00e5ff" ThumbColor="#f0f3f6" VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Merchant Ring -->
+                        <Border BackgroundColor="#1c1f24" Stroke="#2d333d" StrokeShape="RoundRectangle 8" Padding="12, 10">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="Rich Merchant's Ring" TextColor="#f0f3f6" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="+5% Market Silver bonus" TextColor="#8a94a2" FontSize="11" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1" x:Name="MerchantRingSwitch" IsToggled="False" Toggled="OnSettingToggled" OnColor="#00e5ff" ThumbColor="#f0f3f6" VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Family Fame -->
+                        <Border BackgroundColor="#1c1f24" Stroke="#2d333d" StrokeShape="RoundRectangle 8" Padding="12, 10">
+                            <VerticalStackLayout Spacing="6">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="Family Fame" TextColor="#f0f3f6" FontSize="14" FontAttributes="Bold" />
+                                        <Label x:Name="MobileFameBonusLabel" Text="+1.5% (≥ 7,000 Fame)" TextColor="#00e5ff" FontSize="11" />
+                                    </VerticalStackLayout>
+                                    <Entry Grid.Column="1"
+                                           x:Name="FamilyFameEntry"
+                                           Text="7000"
+                                           Keyboard="Numeric"
+                                           TextColor="#f0f3f6"
+                                           BackgroundColor="#101215"
+                                           HorizontalTextAlignment="End"
+                                           WidthRequest="90"
+                                           HeightRequest="36"
+                                           TextChanged="OnFamilyFameTextChanged" />
+                                </Grid>
+                                <Label Text="Tiers: 1k (+0.5%) | 4k (+1.0%) | 7k+ (+1.5%)" TextColor="#8a94a2" FontSize="10" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Rates Summary -->
+                        <Border BackgroundColor="#1b2028" Stroke="#ffc107" StrokeShape="RoundRectangle 8" Padding="12, 10">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="CURRENT MARKET RATES" TextColor="#ffc107" FontSize="11" FontAttributes="Bold" />
+                                <Grid ColumnDefinitions="*, *">
+                                    <VerticalStackLayout Grid.Column="0">
+                                        <Label Text="Payout Rate:" TextColor="#8a94a2" FontSize="11" />
+                                        <Label x:Name="MobilePayoutRateLabel" Text="85.48%" TextColor="#4caf50" FontSize="16" FontAttributes="Bold" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                        <Label Text="Market Tax:" TextColor="#8a94a2" FontSize="11" />
+                                        <Label x:Name="MobileTaxRateLabel" Text="-14.52%" TextColor="#ff5252" FontSize="16" FontAttributes="Bold" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <!-- Done Button -->
+                <Button Grid.Row="2"
+                        Text="Done &amp; Save Settings"
+                        TextColor="#ffffff"
+                        BackgroundColor="#00838f"
+                        CornerRadius="8"
+                        FontAttributes="Bold"
+                        FontSize="14"
+                        HeightRequest="44"
+                        Clicked="OnCloseSettingsClicked" />
+            </Grid>
+        </Border>
 
     </Grid>
 
