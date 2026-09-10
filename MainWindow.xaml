@@ -978,7 +978,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="🛠 " FontSize="11" />
                                         <TextBlock Text="WORK IN PROGRESS" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="11" />
-                                        <TextBlock x:Name="AppVersionLabel" Text=" (v1.3.3)" Foreground="{StaticResource AccentCron}" FontSize="11" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="AppVersionLabel" Text=" (v1.3.4)" Foreground="{StaticResource AccentCron}" FontSize="11" FontWeight="SemiBold" />
                                     </StackPanel>
                                     <TextBlock Text="This calculator is actively maintained and receives regular updates. You will be prompted automatically when a new update is released."
                                                Foreground="{StaticResource TextSecondary}"

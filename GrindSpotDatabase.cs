@@ -21,18 +21,18 @@ public static class GrindSpotDatabase
         // ==========================================
         // --- Edania / Demon Realm (High-End End Game) ---
         // ==========================================
-        new GrindSpot { Name = "Event Horizon", Region = "Edania (Hadum)", TrashPrice = 160_539, RecommendedApDp = "360 AP / 440 DP" },
+        new GrindSpot { Name = "Event Horizon", Region = "Edania (Hadum)", TrashPrice = 196_501, RecommendedApDp = "360 AP / 440 DP" },
         new GrindSpot { Name = "Aresion Temple", Region = "Edania (Aal)", TrashPrice = 160_539, RecommendedApDp = "360 AP / 440 DP" },
         new GrindSpot { Name = "Scales of Judgment", Region = "Edania (Elion 3-Party)", TrashPrice = 160_539, RecommendedApDp = "350 AP / 430 DP" },
         new GrindSpot { Name = "Magaia Temple", Region = "Edania (Elion)", TrashPrice = 160_539, RecommendedApDp = "350 AP / 430 DP" },
-        new GrindSpot { Name = "Hermesia Inner Castle", Region = "Edania (Markthanan)", TrashPrice = 155_127, RecommendedApDp = "340 AP / 430 DP" },
+        new GrindSpot { Name = "Hermesia Inner Castle", Region = "Edania (Markthanan)", TrashPrice = 160_539, RecommendedApDp = "340 AP / 430 DP" },
         new GrindSpot { Name = "Aphrodon Temple", Region = "Edania (Agris)", TrashPrice = 155_127, RecommendedApDp = "330 AP / 420 DP" },
         new GrindSpot { Name = "Aetherion Castle", Region = "Edania (Jordine)", TrashPrice = 105_640, RecommendedApDp = "320 AP / 420 DP" },
 
         // ==========================================
         // --- Olvia Academy & Special Zones ---
         // ==========================================
-        new GrindSpot { Name = "Bumblin' Buccaneers", Region = "Olvia Academy", TrashPrice = 155_000, RecommendedApDp = "250 AP" },
+        new GrindSpot { Name = "Bumblin' Buccaneers", Region = "Olvia Academy", TrashPrice = 13_470, RecommendedApDp = "250 AP" },
         new GrindSpot { Name = "Traitor's Graveyard", Region = "Calpheon (Defense)", TrashPrice = 18_000, RecommendedApDp = "160 AP / 210 DP" },
 
         // ==========================================

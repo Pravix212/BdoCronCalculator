@@ -42,7 +42,7 @@ public sealed class GrindAndHammerTests
     {
         var buccaneers = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Bumblin' Buccaneers"));
         Assert.NotNull(buccaneers);
-        Assert.Equal(155_000m, buccaneers.TrashPrice);
+        Assert.Equal(13_470m, buccaneers.TrashPrice);
 
         var aetherion = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Aetherion"));
         Assert.NotNull(aetherion);
@@ -54,7 +54,7 @@ public sealed class GrindAndHammerTests
 
         var eventHorizon = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Event Horizon"));
         Assert.NotNull(eventHorizon);
-        Assert.Equal(160_539m, eventHorizon.TrashPrice);
+        Assert.Equal(196_501m, eventHorizon.TrashPrice);
     }
 
     [Fact]
