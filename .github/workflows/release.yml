@@ -68,6 +68,7 @@ jobs:
       - name: Build & Publish Signed Android APK
         run: |
           keytool -genkey -v -keystore bdocron.keystore -alias bdocron -keyalg RSA -keysize 2048 -validity 10000 -storepass BdoCron2026! -keypass BdoCron2026! -dname "CN=Pravix, OU=BDO Tools, O=Pravix, C=US"
+          Copy-Item bdocron.keystore -Destination BdoCronCalculator.Mobile/bdocron.keystore
           dotnet publish BdoCronCalculator.Mobile/BdoCronCalculator.Mobile.csproj -f net9.0-android -c Release -p:AndroidPackageFormat=apk -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=bdocron.keystore -p:AndroidSigningKeyAlias=bdocron -p:AndroidSigningKeyPass=BdoCron2026! -p:AndroidSigningStorePass=BdoCron2026! -o android-publish/
 
       - name: Copy & Rename APK
