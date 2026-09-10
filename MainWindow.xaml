@@ -4,8 +4,8 @@
         Title="BDO Cron Calculator"
         Width="340"
         Height="560"
-        MinWidth="250"
-        MinHeight="380"
+        MinWidth="260"
+        MinHeight="450"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -28,15 +28,15 @@
         <Grid>
             <Grid.RowDefinitions>
                 <!-- Title Bar -->
-                <RowDefinition Height="40" />
+                <RowDefinition Height="38" />
                 <!-- Display Section -->
                 <RowDefinition Height="Auto" />
                 <!-- Cron Action Bar -->
-                <RowDefinition Height="46" />
+                <RowDefinition Height="44" />
                 <!-- Standard Calculator Keypad -->
                 <RowDefinition Height="*" />
                 <!-- Quick Silver Multipliers / Footer -->
-                <RowDefinition Height="42" />
+                <RowDefinition Height="38" />
             </Grid.RowDefinitions>
 
             <!-- 1. Custom Title Bar -->
@@ -47,7 +47,7 @@
                     BorderBrush="{StaticResource BorderDark}"
                     BorderThickness="0,0,0,1"
                     MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-                <Grid Margin="10,0,10,0">
+                <Grid Margin="8,0,8,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -60,70 +60,70 @@
                     <!-- Icon -->
                     <Image Grid.Column="0"
                            Source="cronstone.png"
-                           Width="22"
-                           Height="22"
+                           Width="20"
+                           Height="20"
                            VerticalAlignment="Center"
-                           Margin="0,0,8,0" />
+                           Margin="0,0,6,0" />
 
                     <!-- Title -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="BDO " FontWeight="Bold" Foreground="{StaticResource AccentCron}" FontSize="13" />
-                        <TextBlock Text="Cron Calculator" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FontSize="13" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" ClipToBounds="True">
+                        <TextBlock Text="BDO " FontWeight="Bold" Foreground="{StaticResource AccentCron}" FontSize="12" />
+                        <TextBlock Text="Cron Calculator" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FontSize="12" TextTrimming="CharacterEllipsis" />
                     </StackPanel>
 
                     <!-- Settings Button -->
                     <Button Grid.Column="2"
                             x:Name="SettingsButton"
-                            Width="30"
-                            Height="26"
-                            Margin="2,0"
+                            Width="26"
+                            Height="24"
+                            Margin="1,0"
                             Click="SettingsButton_Click"
                             ToolTip="Central Market Tax Settings"
                             Background="Transparent"
                             BorderThickness="0"
                             Cursor="Hand">
-                        <TextBlock Text="⚙" FontSize="14" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="⚙" FontSize="13" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Button>
 
                     <!-- Always-on-Top Pin Button -->
                     <Button Grid.Column="3"
                             x:Name="PinButton"
-                            Width="30"
-                            Height="26"
-                            Margin="2,0"
+                            Width="26"
+                            Height="24"
+                            Margin="1,0"
                             Click="PinButton_Click"
                             ToolTip="Always on Top (Enabled)"
                             Background="Transparent"
                             BorderThickness="0"
                             Cursor="Hand">
-                        <TextBlock x:Name="PinIcon" Text="📌" FontSize="12" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="PinIcon" Text="📌" FontSize="11" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Button>
 
                     <!-- Minimize Button -->
                     <Button Grid.Column="4"
-                            Width="30"
-                            Height="26"
-                            Margin="2,0"
+                            Width="26"
+                            Height="24"
+                            Margin="1,0"
                             Click="MinimizeButton_Click"
                             ToolTip="Minimize"
                             Background="Transparent"
                             BorderThickness="0"
                             Foreground="{StaticResource TextSecondary}"
-                            FontSize="14"
+                            FontSize="13"
                             Content="—"
                             Cursor="Hand" />
 
                     <!-- Close Button -->
                     <Button Grid.Column="5"
-                            Width="30"
-                            Height="26"
-                            Margin="2,0"
+                            Width="26"
+                            Height="24"
+                            Margin="1,0"
                             Click="CloseButton_Click"
                             ToolTip="Close"
                             Background="Transparent"
                             BorderThickness="0"
                             Foreground="#ff5252"
-                            FontSize="14"
+                            FontSize="13"
                             FontWeight="Bold"
                             Content="✕"
                             Cursor="Hand" />
@@ -136,13 +136,13 @@
                     Background="#101215"
                     BorderBrush="{StaticResource BorderDark}"
                     BorderThickness="0,0,0,1"
-                    Padding="14,8">
+                    Padding="12,6">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="24" />
+                        <RowDefinition Height="20" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="28" />
+                        <RowDefinition Height="24" />
                     </Grid.RowDefinitions>
 
                     <!-- In-App Update Banner -->
@@ -153,7 +153,7 @@
                             BorderThickness="1"
                             CornerRadius="6"
                             Padding="8,4"
-                            Margin="0,0,0,6"
+                            Margin="0,0,0,4"
                             Visibility="Collapsed">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -163,11 +163,11 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="✨ " FontSize="11" />
-                                <TextBlock x:Name="UpdateBannerText" Text="v1.2.4 available!" Foreground="{StaticResource TextPrimary}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <TextBlock x:Name="UpdateBannerText" Text="v1.2.6 available!" Foreground="{StaticResource TextPrimary}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
                             </StackPanel>
                             <Button Grid.Column="1"
                                     x:Name="UpdateNowButton"
-                                    Height="22"
+                                    Height="20"
                                     Padding="8,0"
                                     Margin="6,0,4,0"
                                     Background="{StaticResource AccentCron}"
@@ -201,7 +201,7 @@
                                x:Name="ExpressionTapeText"
                                Text=""
                                Foreground="{StaticResource TextSecondary}"
-                               FontSize="13"
+                               FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis" />
@@ -211,7 +211,7 @@
                                x:Name="MainDisplayText"
                                Text="0"
                                Foreground="{StaticResource TextPrimary}"
-                               FontSize="32"
+                               FontSize="28"
                                FontWeight="Bold"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
@@ -221,15 +221,15 @@
                     <Border Grid.Row="3"
                             Background="#1b2028"
                             CornerRadius="4"
-                            Padding="8,2"
+                            Padding="6,2"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="💰 " FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Text="💰 " FontSize="10" VerticalAlignment="Center" />
                             <TextBlock x:Name="SilverSummaryText"
                                        Text="0 Silver"
                                        Foreground="{StaticResource AccentGold}"
-                                       FontSize="12"
+                                       FontSize="11"
                                        FontWeight="SemiBold"
                                        VerticalAlignment="Center" />
                         </StackPanel>
@@ -238,13 +238,13 @@
             </Border>
 
             <!-- 3. Cron & Market Tax Action Bar -->
-            <Border Grid.Row="2" x:Name="ActionBarBorder" Background="{StaticResource BgPanel}" Padding="6,6" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
+            <Border Grid.Row="2" x:Name="ActionBarBorder" Background="{DynamicResource BgPanel}" Padding="6,4" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.2*" />
-                        <ColumnDefinition Width="6" />
+                        <ColumnDefinition Width="4" />
                         <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="6" />
+                        <ColumnDefinition Width="4" />
                         <ColumnDefinition Width="0.9*" />
                     </Grid.ColumnDefinitions>
 
@@ -254,8 +254,8 @@
                             Click="CronButton_Click"
                             ToolTip="Multiply by 3,000,000 (Vendor Cron Stone Price)">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="cronstone.png" Width="18" Height="18" Margin="0,0,6,0" VerticalAlignment="Center" />
-                            <TextBlock Text="CRON" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" />
+                            <Image Source="cronstone.png" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" />
+                            <TextBlock Text="CRON" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
 
@@ -264,7 +264,7 @@
                             Style="{StaticResource CalcButtonStyle}"
                             Click="OutfitCronButton_Click"
                             ToolTip="Multiply by 2,180,000 (Outfit Extraction Cron Price)">
-                        <TextBlock Text="Outfit (2.18M)" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        <TextBlock Text="Outfit (2.18M)" FontSize="10" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
                     </Button>
 
                     <!-- Market Tax Calculator Button -->
@@ -273,60 +273,64 @@
                             Style="{StaticResource TaxButtonStyle}"
                             Click="TaxButton_Click"
                             ToolTip="Calculate Net Market Silver after Tax &amp; Bonuses">
-                        <TextBlock Text="💰 Tax" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center" />
+                        <TextBlock Text="💰 Tax" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center" />
                     </Button>
                 </Grid>
             </Border>
 
             <!-- 4. Standard Keypad Grid -->
-            <Grid Grid.Row="3" Margin="8,8,8,4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Grid Grid.Row="3" Margin="4,4">
+                <Viewbox Stretch="Uniform" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid Width="300" Height="270">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                <!-- Row 0: Clear & Division -->
-                <Button Grid.Row="0" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Foreground="#ff6b6b" Content="C" Click="Clear_Click" />
-                <Button Grid.Row="0" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Foreground="#ffab40" Content="CE" Click="ClearEntry_Click" />
-                <Button Grid.Row="0" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="⌫" Click="Backspace_Click" />
-                <Button Grid.Row="0" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="÷" Click="Operator_Click" Tag="÷" />
+                        <!-- Row 0: Clear & Division -->
+                        <Button Grid.Row="0" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Foreground="#ff6b6b" Content="C" Click="Clear_Click" />
+                        <Button Grid.Row="0" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Foreground="#ffab40" Content="CE" Click="ClearEntry_Click" />
+                        <Button Grid.Row="0" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="⌫" Click="Backspace_Click" />
+                        <Button Grid.Row="0" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="÷" Click="Operator_Click" Tag="÷" />
 
-                <!-- Row 1: 7, 8, 9, × -->
-                <Button Grid.Row="1" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="7" Click="Digit_Click" Tag="7" />
-                <Button Grid.Row="1" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="8" Click="Digit_Click" Tag="8" />
-                <Button Grid.Row="1" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="9" Click="Digit_Click" Tag="9" />
-                <Button Grid.Row="1" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="×" Click="Operator_Click" Tag="×" />
+                        <!-- Row 1: 7, 8, 9, × -->
+                        <Button Grid.Row="1" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="7" Click="Digit_Click" Tag="7" />
+                        <Button Grid.Row="1" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="8" Click="Digit_Click" Tag="8" />
+                        <Button Grid.Row="1" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="9" Click="Digit_Click" Tag="9" />
+                        <Button Grid.Row="1" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="×" Click="Operator_Click" Tag="×" />
 
-                <!-- Row 2: 4, 5, 6, - -->
-                <Button Grid.Row="2" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="4" Click="Digit_Click" Tag="4" />
-                <Button Grid.Row="2" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="5" Click="Digit_Click" Tag="5" />
-                <Button Grid.Row="2" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="6" Click="Digit_Click" Tag="6" />
-                <Button Grid.Row="2" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="-" Click="Operator_Click" Tag="-" />
+                        <!-- Row 2: 4, 5, 6, - -->
+                        <Button Grid.Row="2" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="4" Click="Digit_Click" Tag="4" />
+                        <Button Grid.Row="2" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="5" Click="Digit_Click" Tag="5" />
+                        <Button Grid.Row="2" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="6" Click="Digit_Click" Tag="6" />
+                        <Button Grid.Row="2" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="-" Click="Operator_Click" Tag="-" />
 
-                <!-- Row 3: 1, 2, 3, + -->
-                <Button Grid.Row="3" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="1" Click="Digit_Click" Tag="1" />
-                <Button Grid.Row="3" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="2" Click="Digit_Click" Tag="2" />
-                <Button Grid.Row="3" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="3" Click="Digit_Click" Tag="3" />
-                <Button Grid.Row="3" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="+" Click="Operator_Click" Tag="+" />
+                        <!-- Row 3: 1, 2, 3, + -->
+                        <Button Grid.Row="3" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="1" Click="Digit_Click" Tag="1" />
+                        <Button Grid.Row="3" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="2" Click="Digit_Click" Tag="2" />
+                        <Button Grid.Row="3" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="3" Click="Digit_Click" Tag="3" />
+                        <Button Grid.Row="3" Grid.Column="3" Margin="3" Style="{StaticResource OpButtonStyle}" Content="+" Click="Operator_Click" Tag="+" />
 
-                <!-- Row 4: ±, 0, ., = -->
-                <Button Grid.Row="4" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="±" Click="Negate_Click" />
-                <Button Grid.Row="4" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="0" Click="Digit_Click" Tag="0" />
-                <Button Grid.Row="4" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="." Click="Digit_Click" Tag="." />
-                <Button Grid.Row="4" Grid.Column="3" Margin="3" Style="{StaticResource EqualsButtonStyle}" Content="=" Click="Equals_Click" />
+                        <!-- Row 4: ±, 0, ., = -->
+                        <Button Grid.Row="4" Grid.Column="0" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="±" Click="Negate_Click" />
+                        <Button Grid.Row="4" Grid.Column="1" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="0" Click="Digit_Click" Tag="0" />
+                        <Button Grid.Row="4" Grid.Column="2" Margin="3" Style="{StaticResource CalcButtonStyle}" Content="." Click="Digit_Click" Tag="." />
+                        <Button Grid.Row="4" Grid.Column="3" Margin="3" Style="{StaticResource EqualsButtonStyle}" Content="=" Click="Equals_Click" />
+                    </Grid>
+                </Viewbox>
             </Grid>
 
             <!-- 5. Quick Multipliers / Copy Bar -->
-            <Border Grid.Row="4" x:Name="FooterBorder" Background="{StaticResource BgPanel}" CornerRadius="0,0,10,10" Padding="8,4">
+            <Border Grid.Row="4" x:Name="FooterBorder" Background="{DynamicResource BgPanel}" CornerRadius="0,0,10,10" Padding="6,3">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -336,16 +340,16 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+k (000)" ToolTip="Multiply by 1,000" Click="Multiply_k_Click" />
-                    <Button Grid.Column="1" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+M (Mil)" ToolTip="Multiply by 1,000,000" Click="Multiply_M_Click" />
-                    <Button Grid.Column="2" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="+B (Bil)" ToolTip="Multiply by 1,000,000,000" Click="Multiply_B_Click" />
-                    <Button Grid.Column="3" Margin="2" Style="{StaticResource CalcButtonStyle}" FontSize="12" Content="📋 Copy" ToolTip="Copy formatted result to clipboard" Click="Copy_Click" />
+                    <Button Grid.Column="0" Margin="1" Style="{StaticResource CalcButtonStyle}" FontSize="11" Content="+k" ToolTip="Multiply by 1,000" Click="Multiply_k_Click" />
+                    <Button Grid.Column="1" Margin="1" Style="{StaticResource CalcButtonStyle}" FontSize="11" Content="+M" ToolTip="Multiply by 1,000,000" Click="Multiply_M_Click" />
+                    <Button Grid.Column="2" Margin="1" Style="{StaticResource CalcButtonStyle}" FontSize="11" Content="+B" ToolTip="Multiply by 1,000,000,000" Click="Multiply_B_Click" />
+                    <Button Grid.Column="3" Margin="1" Style="{StaticResource CalcButtonStyle}" FontSize="11" Content="📋 Copy" ToolTip="Copy formatted result to clipboard" Click="Copy_Click" />
                     
                     <!-- Bottom-Right Resize Grip Thumb -->
                     <Thumb x:Name="ResizeGripThumb"
                            Grid.Column="4"
-                           Width="24"
-                           Height="24"
+                           Width="20"
+                           Height="20"
                            Cursor="SizeNWSE"
                            DragDelta="ResizeGripThumb_DragDelta"
                            Background="Transparent"
@@ -354,7 +358,7 @@
                         <Thumb.Template>
                             <ControlTemplate TargetType="Thumb">
                                 <Border Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <TextBlock Text="⋰" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,2,2" />
+                                    <TextBlock Text="⋰" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,2,2" />
                                 </Border>
                             </ControlTemplate>
                         </Thumb.Template>
