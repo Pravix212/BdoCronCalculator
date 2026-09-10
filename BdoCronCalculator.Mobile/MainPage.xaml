@@ -25,34 +25,74 @@
         </Grid>
 
         <!-- 2. Display Section -->
-        <Border Grid.Row="1" BackgroundColor="#101215" Stroke="#2d333d" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="16, 12">
-            <VerticalStackLayout Spacing="4">
-                <!-- Expression Tape -->
-                <Label x:Name="ExpressionTapeLabel"
-                       Text=""
-                       TextColor="#8a94a2"
-                       FontSize="14"
-                       HorizontalTextAlignment="End"
-                       LineBreakMode="TailTruncation" />
+        <VerticalStackLayout Grid.Row="1" Spacing="6">
+            <!-- In-App Update Banner -->
+            <Border x:Name="UpdateBanner"
+                    BackgroundColor="#183642"
+                    Stroke="#00e5ff"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="10, 6"
+                    IsVisible="False">
+                <Grid ColumnDefinitions="*, Auto, Auto">
+                    <Label x:Name="UpdateBannerLabel"
+                           Text="✨ v1.2.4 available!"
+                           TextColor="#f0f3f6"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="Update"
+                            TextColor="#131518"
+                            BackgroundColor="#00e5ff"
+                            CornerRadius="6"
+                            FontAttributes="Bold"
+                            FontSize="11"
+                            HeightRequest="30"
+                            Padding="10, 0"
+                            Margin="6, 0, 4, 0"
+                            Clicked="OnUpdateClicked" />
+                    <Button Grid.Column="2"
+                            Text="✕"
+                            TextColor="#8a94a2"
+                            BackgroundColor="Transparent"
+                            FontSize="12"
+                            HeightRequest="30"
+                            WidthRequest="30"
+                            Padding="0"
+                            Clicked="OnDismissUpdateClicked" />
+                </Grid>
+            </Border>
 
-                <!-- Main Number Display -->
-                <Label x:Name="MainDisplayLabel"
-                       Text="0"
-                       TextColor="#f0f3f6"
-                       FontSize="34"
-                       FontAttributes="Bold"
-                       HorizontalTextAlignment="End"
-                       LineBreakMode="TailTruncation" />
+            <Border BackgroundColor="#101215" Stroke="#2d333d" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="16, 12">
+                <VerticalStackLayout Spacing="4">
+                    <!-- Expression Tape -->
+                    <Label x:Name="ExpressionTapeLabel"
+                           Text=""
+                           TextColor="#8a94a2"
+                           FontSize="14"
+                           HorizontalTextAlignment="End"
+                           LineBreakMode="TailTruncation" />
 
-                <!-- Silver Summary -->
-                <Border BackgroundColor="#1b2028" Stroke="#2d333d" StrokeShape="RoundRectangle 6" Padding="10, 4" HorizontalOptions="End" Margin="0, 4, 0, 0">
-                    <HorizontalStackLayout Spacing="4">
-                        <Label Text="💰" FontSize="12" VerticalOptions="Center" />
-                        <Label x:Name="SilverSummaryLabel" Text="0 Silver" TextColor="#ffc107" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-        </Border>
+                    <!-- Main Number Display -->
+                    <Label x:Name="MainDisplayLabel"
+                           Text="0"
+                           TextColor="#f0f3f6"
+                           FontSize="34"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="End"
+                           LineBreakMode="TailTruncation" />
+
+                    <!-- Silver Summary -->
+                    <Border BackgroundColor="#1b2028" Stroke="#2d333d" StrokeShape="RoundRectangle 6" Padding="10, 4" HorizontalOptions="End" Margin="0, 4, 0, 0">
+                        <HorizontalStackLayout Spacing="4">
+                            <Label Text="💰" FontSize="12" VerticalOptions="Center" />
+                            <Label x:Name="SilverSummaryLabel" Text="0 Silver" TextColor="#ffc107" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
 
         <!-- 3. Cron & Tax Action Buttons Row -->
         <Grid Grid.Row="2" ColumnDefinitions="1.1*, 1.1*, 0.9*" ColumnSpacing="6">
@@ -214,6 +254,20 @@
                                         <Label x:Name="MobileTaxRateLabel" Text="-14.52%" TextColor="#ff5252" FontSize="16" FontAttributes="Bold" />
                                     </VerticalStackLayout>
                                 </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Work in Progress / Version Info Card -->
+                        <Border BackgroundColor="#161a20" Stroke="#2d333d" StrokeShape="RoundRectangle 8" Padding="12, 10">
+                            <VerticalStackLayout Spacing="4">
+                                <HorizontalStackLayout Spacing="4">
+                                    <Label Text="🛠" FontSize="11" />
+                                    <Label Text="WORK IN PROGRESS" TextColor="#f0f3f6" FontSize="11" FontAttributes="Bold" />
+                                    <Label x:Name="MobileAppVersionLabel" Text=" (v1.2.4)" TextColor="#00e5ff" FontSize="11" FontAttributes="Bold" />
+                                </HorizontalStackLayout>
+                                <Label Text="This calculator is actively maintained and receives regular updates. You will be prompted automatically when a new update is released."
+                                       TextColor="#8a94a2"
+                                       FontSize="11" />
                             </VerticalStackLayout>
                         </Border>
                     </VerticalStackLayout>

@@ -180,4 +180,25 @@ public sealed class CalculatorEngineTests
         Assert.Equal("Overflow (Number too large)", engine.ExpressionTape);
         Assert.Equal(0m, engine.CurrentValue);
     }
+
+    [Fact]
+    public void UpdateService_VersionParsingAndComparison()
+    {
+        var current = new Version(1, 2, 4);
+        var newer = new Version(1, 2, 5);
+        var older = new Version(1, 2, 3);
+        var same = new Version(1, 2, 4);
+
+        Assert.True(newer > current);
+        Assert.False(older > current);
+        Assert.False(same > current);
+    }
+
+    [Fact]
+    public void UpdateService_GetCurrentVersion_ReturnsValidVersion()
+    {
+        var version = UpdateService.GetCurrentVersion();
+        Assert.NotNull(version);
+        Assert.True(version.Major >= 1);
+    }
 }

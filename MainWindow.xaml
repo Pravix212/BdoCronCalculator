@@ -134,13 +134,65 @@
                     Padding="14,8">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="24" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="28" />
                     </Grid.RowDefinitions>
 
+                    <!-- In-App Update Banner -->
+                    <Border Grid.Row="0"
+                            x:Name="UpdateBanner"
+                            Background="#183642"
+                            BorderBrush="{StaticResource AccentCron}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="8,4"
+                            Margin="0,0,0,6"
+                            Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="✨ " FontSize="11" />
+                                <TextBlock x:Name="UpdateBannerText" Text="v1.2.4 available!" Foreground="{StaticResource TextPrimary}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    x:Name="UpdateNowButton"
+                                    Height="22"
+                                    Padding="8,0"
+                                    Margin="6,0,4,0"
+                                    Background="{StaticResource AccentCron}"
+                                    Foreground="#131518"
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                    Content="Update"
+                                    Cursor="Hand"
+                                    Click="UpdateNowButton_Click">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Width="18"
+                                    Height="18"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="{StaticResource TextSecondary}"
+                                    FontSize="10"
+                                    Content="✕"
+                                    Cursor="Hand"
+                                    Click="DismissUpdate_Click" />
+                        </Grid>
+                    </Border>
+
                     <!-- Expression Tape / History -->
-                    <TextBlock Grid.Row="0"
+                    <TextBlock Grid.Row="1"
                                x:Name="ExpressionTapeText"
                                Text=""
                                Foreground="{StaticResource TextSecondary}"
@@ -150,7 +202,7 @@
                                TextTrimming="CharacterEllipsis" />
 
                     <!-- Main Number Display -->
-                    <TextBlock Grid.Row="1"
+                    <TextBlock Grid.Row="2"
                                x:Name="MainDisplayText"
                                Text="0"
                                Foreground="{StaticResource TextPrimary}"
@@ -161,7 +213,7 @@
                                TextTrimming="CharacterEllipsis" />
 
                     <!-- Live Silver Breakdown Summary -->
-                    <Border Grid.Row="2"
+                    <Border Grid.Row="3"
                             Background="#1b2028"
                             CornerRadius="4"
                             Padding="8,2"
@@ -375,7 +427,7 @@
                             </Border>
 
                             <!-- Live Rates Card -->
-                            <Border Background="#1b2028" BorderBrush="{StaticResource AccentGold}" BorderThickness="1" CornerRadius="8" Padding="12,10">
+                            <Border Background="#1b2028" BorderBrush="{StaticResource AccentGold}" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
                                 <StackPanel>
                                     <TextBlock Text="CURRENT MARKET RATES" FontWeight="Bold" Foreground="{StaticResource AccentGold}" FontSize="11" />
                                     <Grid Margin="0,6,0,0">
@@ -392,6 +444,22 @@
                                             <TextBlock x:Name="SettingsTaxRateText" Text="-14.52%" Foreground="#ff5252" FontSize="16" FontWeight="Bold" Margin="0,2,0,0" />
                                         </StackPanel>
                                     </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Work in Progress / Project Info Card -->
+                            <Border Background="#161a20" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="12,10">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🛠 " FontSize="11" />
+                                        <TextBlock Text="WORK IN PROGRESS" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="11" />
+                                        <TextBlock x:Name="AppVersionLabel" Text=" (v1.2.4)" Foreground="{StaticResource AccentCron}" FontSize="11" FontWeight="SemiBold" />
+                                    </StackPanel>
+                                    <TextBlock Text="This calculator is actively maintained and receives regular updates. You will be prompted automatically when a new update is released."
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>

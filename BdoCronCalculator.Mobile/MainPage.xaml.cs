@@ -1,3 +1,4 @@
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices;
 
 namespace BdoCronCalculator.Mobile;
@@ -6,6 +7,7 @@ public partial class MainPage : ContentPage
 {
     private readonly CalculatorEngine _engine = new();
     private bool _isInitialized = false;
+    private UpdateInfo? _pendingUpdate = null;
 
     public MainPage()
     {
@@ -13,6 +15,60 @@ public partial class MainPage : ContentPage
         _isInitialized = true;
         LoadSettingsIntoUI();
         UpdateUI();
+        _ = CheckForAppUpdatesAsync();
+    }
+
+    private async Task CheckForAppUpdatesAsync()
+    {
+        try
+        {
+            var update = await UpdateService.CheckForUpdatesAsync();
+            if (update != null && update.HasUpdate)
+            {
+                _pendingUpdate = update;
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (UpdateBanner != null && UpdateBannerLabel != null)
+                    {
+                        UpdateBannerLabel.Text = $"✨ {update.LatestVersion} available!";
+                        UpdateBanner.IsVisible = true;
+                    }
+                });
+            }
+        }
+        catch
+        {
+            // Silent fallback
+        }
+    }
+
+    private async void OnUpdateClicked(object sender, EventArgs e)
+    {
+        TriggerHaptic();
+        if (_pendingUpdate != null)
+        {
+            string? targetUrl = _pendingUpdate.ApkDownloadUrl ?? _pendingUpdate.ReleaseUrl;
+            if (!string.IsNullOrEmpty(targetUrl))
+            {
+                try
+                {
+                    await Launcher.Default.OpenAsync(new Uri(targetUrl));
+                }
+                catch
+                {
+                    // Fallback
+                }
+            }
+        }
+    }
+
+    private void OnDismissUpdateClicked(object sender, EventArgs e)
+    {
+        TriggerHaptic();
+        if (UpdateBanner != null)
+        {
+            UpdateBanner.IsVisible = false;
+        }
     }
 
     private void LoadSettingsIntoUI()
@@ -21,6 +77,11 @@ public partial class MainPage : ContentPage
         if (ValuePackSwitch != null) ValuePackSwitch.IsToggled = s.HasValuePack;
         if (MerchantRingSwitch != null) MerchantRingSwitch.IsToggled = s.HasMerchantRing;
         if (FamilyFameEntry != null) FamilyFameEntry.Text = s.FamilyFame.ToString();
+
+        var curVer = UpdateService.GetCurrentVersion();
+        if (MobileAppVersionLabel != null)
+            MobileAppVersionLabel.Text = $" (v{curVer.Major}.{curVer.Minor}.{curVer.Build})";
+
         UpdateSettingsRatesDisplay();
     }
 

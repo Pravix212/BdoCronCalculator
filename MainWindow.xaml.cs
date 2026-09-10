@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +12,7 @@ public partial class MainWindow : Window
 {
     private readonly CalculatorEngine _engine = new();
     private bool _isInitialized = false;
+    private UpdateInfo? _pendingUpdate = null;
 
     public MainWindow()
     {
@@ -17,6 +20,78 @@ public partial class MainWindow : Window
         _isInitialized = true;
         LoadSettingsIntoUI();
         UpdateUI();
+        _ = CheckForAppUpdatesAsync();
+    }
+
+    private async Task CheckForAppUpdatesAsync()
+    {
+        try
+        {
+            var update = await UpdateService.CheckForUpdatesAsync();
+            if (update != null && update.HasUpdate)
+            {
+                _pendingUpdate = update;
+                Dispatcher.Invoke(() =>
+                {
+                    if (UpdateBanner != null && UpdateBannerText != null)
+                    {
+                        UpdateBannerText.Text = $"{update.LatestVersion} available!";
+                        UpdateBanner.Visibility = Visibility.Visible;
+                    }
+                });
+            }
+        }
+        catch
+        {
+            // Silent fallback
+        }
+    }
+
+    private async void UpdateNowButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_pendingUpdate == null) return;
+
+        if (!string.IsNullOrEmpty(_pendingUpdate.ExeDownloadUrl))
+        {
+            try
+            {
+                UpdateNowButton.IsEnabled = false;
+                UpdateNowButton.Content = "Downloading...";
+                await UpdateService.DownloadAndApplyWindowsUpdateAsync(_pendingUpdate.ExeDownloadUrl, progress =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        UpdateNowButton.Content = $"{progress}%";
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to apply update automatically:\n{ex.Message}\n\nOpening download page instead.",
+                                "Update Notice",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+
+                if (!string.IsNullOrEmpty(_pendingUpdate.ReleaseUrl))
+                {
+                    Process.Start(new ProcessStartInfo(_pendingUpdate.ReleaseUrl) { UseShellExecute = true });
+                }
+                UpdateBanner.Visibility = Visibility.Collapsed;
+            }
+        }
+        else if (!string.IsNullOrEmpty(_pendingUpdate.ReleaseUrl))
+        {
+            Process.Start(new ProcessStartInfo(_pendingUpdate.ReleaseUrl) { UseShellExecute = true });
+            UpdateBanner.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void DismissUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (UpdateBanner != null)
+        {
+            UpdateBanner.Visibility = Visibility.Collapsed;
+        }
     }
 
     private void LoadSettingsIntoUI()
@@ -25,6 +100,11 @@ public partial class MainWindow : Window
         if (ValuePackCheckBox != null) ValuePackCheckBox.IsChecked = s.HasValuePack;
         if (MerchantRingCheckBox != null) MerchantRingCheckBox.IsChecked = s.HasMerchantRing;
         if (FamilyFameTextBox != null) FamilyFameTextBox.Text = s.FamilyFame.ToString();
+        
+        var curVer = UpdateService.GetCurrentVersion();
+        if (AppVersionLabel != null)
+            AppVersionLabel.Text = $" (v{curVer.Major}.{curVer.Minor}.{curVer.Build})";
+
         UpdateSettingsRatesDisplay();
     }
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android</TargetFrameworks>
@@ -16,8 +16,8 @@
 		<ApplicationId>com.pravix.bdocroncalculator</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.2.4</ApplicationDisplayVersion>
+		<ApplicationVersion>3</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
@@ -41,8 +41,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!-- Compile shared CalculatorEngine directly -->
+		<!-- Compile shared CalculatorEngine and UpdateService directly -->
 		<Compile Include="..\CalculatorEngine.cs" Link="CalculatorEngine.cs" />
+		<Compile Include="..\UpdateService.cs" Link="UpdateService.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
