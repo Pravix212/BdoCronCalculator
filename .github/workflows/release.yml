@@ -65,13 +65,17 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
 
-      - name: Build & Publish Android APK
+      - name: Build & Publish Signed Android APK
         run: |
-          dotnet publish BdoCronCalculator.Mobile/BdoCronCalculator.Mobile.csproj -f net9.0-android -c Release -p:AndroidPackageFormat=apk -o android-publish/
+          keytool -genkey -v -keystore bdocron.keystore -alias bdocron -keyalg RSA -keysize 2048 -validity 10000 -storepass BdoCron2026! -keypass BdoCron2026! -dname "CN=Pravix, OU=BDO Tools, O=Pravix, C=US"
+          dotnet publish BdoCronCalculator.Mobile/BdoCronCalculator.Mobile.csproj -f net9.0-android -c Release -p:AndroidPackageFormat=apk -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=bdocron.keystore -p:AndroidSigningKeyAlias=bdocron -p:AndroidSigningKeyPass=BdoCron2026! -p:AndroidSigningStorePass=BdoCron2026! -o android-publish/
 
       - name: Copy & Rename APK
         run: |
-          $apk = Get-ChildItem -Path android-publish -Filter *.apk -Recurse | Select-Object -First 1
+          $apk = Get-ChildItem -Path android-publish -Filter *Signed.apk -Recurse | Select-Object -First 1
+          if (-not $apk) {
+            $apk = Get-ChildItem -Path android-publish -Filter *.apk -Recurse | Select-Object -First 1
+          }
           Copy-Item $apk.FullName -Destination "BdoCronCalculator.apk"
 
       - name: Upload Android Artifact
