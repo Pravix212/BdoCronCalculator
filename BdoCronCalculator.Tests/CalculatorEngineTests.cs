@@ -164,4 +164,20 @@ public sealed class CalculatorEngineTests
         Assert.Equal(0.65m * 1.365m, settings.EffectivePayoutRate); // 88.725%
         Assert.Equal(0.11275m, settings.EffectiveTaxRate); // 11.275%
     }
+
+    [Fact]
+    public void Arithmetic_WhenOverflows_SetsOverflowMessageWithoutCrashing()
+    {
+        var engine = new CalculatorEngine();
+        engine.InputDigit('1');
+        for (int i = 0; i < 15; i++)
+        {
+            engine.InputDigit('0');
+        }
+        engine.MultiplyByThousand(1_000_000_000); // 10^24
+        engine.MultiplyByThousand(1_000_000_000); // Exceeds decimal.MaxValue
+
+        Assert.Equal("Overflow (Number too large)", engine.ExpressionTape);
+        Assert.Equal(0m, engine.CurrentValue);
+    }
 }

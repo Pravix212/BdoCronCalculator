@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
@@ -187,8 +187,20 @@ public class CalculatorEngine
 
         if (_storedOperand.HasValue && !_isNewEntry)
         {
-            current = ExecuteOperation(_storedOperand.Value, current, _pendingOperator);
-            _currentInput = current.ToString(CultureInfo.InvariantCulture);
+            try
+            {
+                current = ExecuteOperation(_storedOperand.Value, current, _pendingOperator);
+                _currentInput = current.ToString(CultureInfo.InvariantCulture);
+            }
+            catch (OverflowException)
+            {
+                ExpressionTape = "Overflow (Number too large)";
+                _currentInput = "0";
+                _storedOperand = null;
+                _pendingOperator = null;
+                _isNewEntry = true;
+                return;
+            }
         }
 
         _storedOperand = current;
@@ -206,43 +218,76 @@ public class CalculatorEngine
             return;
         }
 
-        decimal right = CurrentValue;
-        decimal left = _storedOperand.Value;
-        decimal result = ExecuteOperation(left, right, _pendingOperator);
+        try
+        {
+            decimal right = CurrentValue;
+            decimal left = _storedOperand.Value;
+            decimal result = ExecuteOperation(left, right, _pendingOperator);
 
-        ExpressionTape = $"{left.ToString("N0", CultureInfo.InvariantCulture)} {_pendingOperator} {right.ToString("N0", CultureInfo.InvariantCulture)} =";
-        _currentInput = result.ToString(CultureInfo.InvariantCulture);
-        _storedOperand = null;
-        _pendingOperator = null;
-        _isNewEntry = true;
+            ExpressionTape = $"{left.ToString("N0", CultureInfo.InvariantCulture)} {_pendingOperator} {right.ToString("N0", CultureInfo.InvariantCulture)} =";
+            _currentInput = result.ToString(CultureInfo.InvariantCulture);
+            _storedOperand = null;
+            _pendingOperator = null;
+            _isNewEntry = true;
+        }
+        catch (OverflowException)
+        {
+            ExpressionTape = "Overflow (Number too large)";
+            _currentInput = "0";
+            _storedOperand = null;
+            _pendingOperator = null;
+            _isNewEntry = true;
+        }
     }
 
     public void CalculateCronCost(decimal? customCronPrice = null)
     {
-        decimal price = customCronPrice ?? _currentCronPrice;
-        decimal count = CurrentValue;
-        decimal totalSilver = count * price;
+        try
+        {
+            decimal price = customCronPrice ?? _currentCronPrice;
+            decimal count = CurrentValue;
+            decimal totalSilver = checked(count * price);
 
-        ExpressionTape = $"{count.ToString("N0", CultureInfo.InvariantCulture)} Crons × {price.ToString("N0", CultureInfo.InvariantCulture)} =";
-        _currentInput = totalSilver.ToString(CultureInfo.InvariantCulture);
-        _storedOperand = null;
-        _pendingOperator = null;
-        _isNewEntry = true;
+            ExpressionTape = $"{count.ToString("N0", CultureInfo.InvariantCulture)} Crons × {price.ToString("N0", CultureInfo.InvariantCulture)} =";
+            _currentInput = totalSilver.ToString(CultureInfo.InvariantCulture);
+            _storedOperand = null;
+            _pendingOperator = null;
+            _isNewEntry = true;
+        }
+        catch (OverflowException)
+        {
+            ExpressionTape = "Overflow (Number too large)";
+            _currentInput = "0";
+            _storedOperand = null;
+            _pendingOperator = null;
+            _isNewEntry = true;
+        }
     }
 
     public void CalculateMarketTax()
     {
-        decimal gross = CurrentValue;
-        decimal payoutRate = _taxSettings.EffectivePayoutRate;
-        decimal netProfit = Math.Round(gross * payoutRate, MidpointRounding.AwayFromZero);
-        decimal taxAmount = gross - netProfit;
-        decimal taxPercent = _taxSettings.EffectiveTaxRate * 100m;
+        try
+        {
+            decimal gross = CurrentValue;
+            decimal payoutRate = _taxSettings.EffectivePayoutRate;
+            decimal netProfit = Math.Round(checked(gross * payoutRate), MidpointRounding.AwayFromZero);
+            decimal taxAmount = gross - netProfit;
+            decimal taxPercent = _taxSettings.EffectiveTaxRate * 100m;
 
-        ExpressionTape = $"{gross.ToString("N0", CultureInfo.InvariantCulture)} - Tax ({taxPercent.ToString("N2", CultureInfo.InvariantCulture)}%) =";
-        _currentInput = netProfit.ToString(CultureInfo.InvariantCulture);
-        _storedOperand = null;
-        _pendingOperator = null;
-        _isNewEntry = true;
+            ExpressionTape = $"{gross.ToString("N0", CultureInfo.InvariantCulture)} - Tax ({taxPercent.ToString("N2", CultureInfo.InvariantCulture)}%) =";
+            _currentInput = netProfit.ToString(CultureInfo.InvariantCulture);
+            _storedOperand = null;
+            _pendingOperator = null;
+            _isNewEntry = true;
+        }
+        catch (OverflowException)
+        {
+            ExpressionTape = "Overflow (Number too large)";
+            _currentInput = "0";
+            _storedOperand = null;
+            _pendingOperator = null;
+            _isNewEntry = true;
+        }
     }
 
     public void Clear()
@@ -306,18 +351,27 @@ public class CalculatorEngine
 
     public void MultiplyByThousand(int multiplier)
     {
-        decimal val = CurrentValue * multiplier;
-        _currentInput = val.ToString(CultureInfo.InvariantCulture);
-        _isNewEntry = true;
+        try
+        {
+            decimal val = checked(CurrentValue * multiplier);
+            _currentInput = val.ToString(CultureInfo.InvariantCulture);
+            _isNewEntry = true;
+        }
+        catch (OverflowException)
+        {
+            ExpressionTape = "Overflow (Number too large)";
+            _currentInput = "0";
+            _isNewEntry = true;
+        }
     }
 
     private static decimal ExecuteOperation(decimal left, decimal right, string? op)
     {
         return op switch
         {
-            "+" => left + right,
-            "-" => left - right,
-            "×" or "*" => left * right,
+            "+" => checked(left + right),
+            "-" => checked(left - right),
+            "×" or "*" => checked(left * right),
             "÷" or "/" => right != 0m ? left / right : 0m,
             _ => right
         };
@@ -333,6 +387,16 @@ public class CalculatorEngine
         decimal abs = Math.Abs(value);
         string sign = value < 0 ? "-" : "";
 
+        if (abs >= 1_000_000_000_000_000_000m) // Quintillion
+        {
+            decimal q = abs / 1_000_000_000_000_000_000m;
+            return $"{sign}{q.ToString("N2", CultureInfo.InvariantCulture)} Quintillion Silver";
+        }
+        if (abs >= 1_000_000_000_000_000m) // Quadrillion
+        {
+            decimal q = abs / 1_000_000_000_000_000m;
+            return $"{sign}{q.ToString("N2", CultureInfo.InvariantCulture)} Quadrillion Silver";
+        }
         if (abs >= 1_000_000_000_000m) // Trillion
         {
             decimal t = abs / 1_000_000_000_000m;
