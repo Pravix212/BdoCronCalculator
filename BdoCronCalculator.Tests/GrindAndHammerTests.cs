@@ -10,7 +10,7 @@ public sealed class GrindAndHammerTests
     public void GrindSpotDatabase_HasValidSpots_NoNegativeOrZeroPrices()
     {
         Assert.NotEmpty(GrindSpotDatabase.AllSpots);
-        Assert.True(GrindSpotDatabase.AllSpots.Count >= 30);
+        Assert.True(GrindSpotDatabase.AllSpots.Count >= 50, $"Database has {GrindSpotDatabase.AllSpots.Count} spots, expected >= 50");
 
         foreach (var spot in GrindSpotDatabase.AllSpots)
         {
@@ -18,6 +18,20 @@ public sealed class GrindAndHammerTests
             Assert.False(string.IsNullOrWhiteSpace(spot.Region));
             Assert.True(spot.TrashPrice > 0, $"Spot {spot.Name} must have a positive trash price.");
         }
+    }
+
+    [Theory]
+    [InlineData("hexe", 2)] // Elvia Hexe Sanctuary, Hexe Sanctuary (Standard)
+    [InlineData("dehkia", 14)] // All Dehkia spots
+    [InlineData("orcs", 1)] // Elvia Orc Camp
+    [InlineData("morning light", 6)] // Land of the morning light spots
+    public void GrindSpotDatabase_SearchFiltering_ReturnsExpectedMatches(string query, int minimumMatches)
+    {
+        var filtered = GrindSpotDatabase.AllSpots
+            .Where(s => s.Name.ToLowerInvariant().Contains(query) || s.Region.ToLowerInvariant().Contains(query))
+            .ToList();
+
+        Assert.True(filtered.Count >= minimumMatches, $"Query '{query}' returned {filtered.Count} matches, expected at least {minimumMatches}");
     }
 
     [Fact]

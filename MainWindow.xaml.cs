@@ -55,6 +55,8 @@ public partial class MainWindow : Window
         if (GrindSpotComboBox != null)
         {
             GrindSpotComboBox.ItemsSource = GrindSpotDatabase.AllSpots;
+            if (GrindSpotCountLabel != null)
+                GrindSpotCountLabel.Text = $"({GrindSpotDatabase.AllSpots.Count} spots)";
             if (GrindSpotDatabase.AllSpots.Count > 0)
             {
                 GrindSpotComboBox.SelectedIndex = 0;
@@ -469,6 +471,34 @@ public partial class MainWindow : Window
     private void CloseGrindOverlay_Click(object sender, RoutedEventArgs e)
     {
         if (GrindOverlay != null) GrindOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void GrindSpotSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isInitialized || GrindSpotComboBox == null) return;
+
+        string filter = GrindSpotSearchBox.Text?.Trim().ToLowerInvariant() ?? "";
+        if (string.IsNullOrEmpty(filter))
+        {
+            GrindSpotComboBox.ItemsSource = GrindSpotDatabase.AllSpots;
+            if (GrindSpotCountLabel != null)
+                GrindSpotCountLabel.Text = $"({GrindSpotDatabase.AllSpots.Count} spots)";
+        }
+        else
+        {
+            var filtered = GrindSpotDatabase.AllSpots
+                .Where(s => s.Name.ToLowerInvariant().Contains(filter) ||
+                            s.Region.ToLowerInvariant().Contains(filter))
+                .ToList();
+            GrindSpotComboBox.ItemsSource = filtered;
+            if (GrindSpotCountLabel != null)
+                GrindSpotCountLabel.Text = $"({filtered.Count} found)";
+        }
+
+        if (GrindSpotComboBox.Items.Count > 0)
+        {
+            GrindSpotComboBox.SelectedIndex = 0;
+        }
     }
 
     private void GrindSpotComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

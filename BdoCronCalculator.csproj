@@ -17,9 +17,9 @@
     <Authors>Pravix</Authors>
     <Description>Lightweight desktop &amp; mobile calculator for Black Desert Online enhancement and central market tax.</Description>
     <Copyright>Copyright © 2026 Pravix</Copyright>
-    <Version>1.3.0</Version>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
+    <Version>1.3.1</Version>
+    <AssemblyVersion>1.3.1.0</AssemblyVersion>
+    <FileVersion>1.3.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

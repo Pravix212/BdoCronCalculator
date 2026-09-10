@@ -489,9 +489,25 @@
                             <!-- Spot Selector Card -->
                             <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
                                 <StackPanel>
-                                    <TextBlock Text="Select Grind Spot" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" />
+                                    <Grid Margin="0,0,0,4">
+                                        <TextBlock Text="Select Grind Spot" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="GrindSpotCountLabel" Text="(60+ spots)" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+                                    
+                                    <!-- Live Search Box -->
+                                    <TextBox x:Name="GrindSpotSearchBox"
+                                             Height="26"
+                                             Margin="0,2,0,4"
+                                             FontSize="11"
+                                             Background="#101215"
+                                             Foreground="{StaticResource TextPrimary}"
+                                             BorderBrush="{StaticResource BorderDark}"
+                                             Padding="6,2"
+                                             TextChanged="GrindSpotSearchBox_TextChanged"
+                                             ToolTip="Type spot name or region to filter (e.g. 'hexe', 'orcs', 'ulukita', 'dehkia', 'centaur')" />
+
                                     <ComboBox x:Name="GrindSpotComboBox"
-                                              Margin="0,6,0,4"
+                                              Margin="0,2,0,4"
                                               Height="28"
                                               DisplayMemberPath="DisplayName"
                                               SelectionChanged="GrindSpotComboBox_SelectionChanged" />
@@ -944,7 +960,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="🛠 " FontSize="11" />
                                         <TextBlock Text="WORK IN PROGRESS" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="11" />
-                                        <TextBlock x:Name="AppVersionLabel" Text=" (v1.3.0)" Foreground="{StaticResource AccentCron}" FontSize="11" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="AppVersionLabel" Text=" (v1.3.1)" Foreground="{StaticResource AccentCron}" FontSize="11" FontWeight="SemiBold" />
                                     </StackPanel>
                                     <TextBlock Text="This calculator is actively maintained and receives regular updates. You will be prompted automatically when a new update is released."
                                                Foreground="{StaticResource TextSecondary}"
