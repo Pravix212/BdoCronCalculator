@@ -294,6 +294,15 @@ public class CalculatorEngine
         }
     }
 
+    public void SetCurrentValue(decimal value, string expressionTape = "")
+    {
+        _currentInput = value.ToString(CultureInfo.InvariantCulture);
+        _storedOperand = null;
+        _pendingOperator = null;
+        ExpressionTape = expressionTape;
+        _isNewEntry = true;
+    }
+
     public void Clear()
     {
         _currentInput = "0";

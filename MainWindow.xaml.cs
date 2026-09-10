@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,9 @@ public partial class MainWindow : Window
 
     private readonly CalculatorEngine _engine = new();
     private bool _isInitialized = false;
+    private bool _isHudMode = false;
+    private double _preHudWidth = 350.0;
+    private double _preHudHeight = 580.0;
     private UpdateInfo? _pendingUpdate = null;
 
     public MainWindow()
@@ -37,10 +41,35 @@ public partial class MainWindow : Window
 
         SizeChanged += MainWindow_SizeChanged;
 
+        InitializeToolViews();
+
         _isInitialized = true;
         LoadSettingsIntoUI();
         UpdateUI();
         _ = CheckForAppUpdatesAsync();
+    }
+
+    private void InitializeToolViews()
+    {
+        // 1. Populate Grind Spot ComboBox
+        if (GrindSpotComboBox != null)
+        {
+            GrindSpotComboBox.ItemsSource = GrindSpotDatabase.AllSpots;
+            if (GrindSpotDatabase.AllSpots.Count > 0)
+            {
+                GrindSpotComboBox.SelectedIndex = 0;
+            }
+        }
+
+        // 2. Populate Hammer Targets ComboBox
+        if (HammerTargetComboBox != null)
+        {
+            HammerTargetComboBox.ItemsSource = HammerComparisonEngine.Targets;
+            if (HammerComparisonEngine.Targets.Count > 0)
+            {
+                HammerTargetComboBox.SelectedIndex = 0;
+            }
+        }
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -86,7 +115,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (_isInitialized && WindowState == WindowState.Normal)
+        if (_isInitialized && !_isHudMode && WindowState == WindowState.Normal)
         {
             _engine.TaxSettings.WindowWidth = ActualWidth;
             _engine.TaxSettings.WindowHeight = ActualHeight;
@@ -218,6 +247,15 @@ public partial class MainWindow : Window
         if (FooterBorder != null)
             FooterBorder.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0x1c, 0x1f, 0x24));
 
+        if (HudView != null)
+            HudView.Background = new SolidColorBrush(Color.FromArgb(displayAlpha, 0x10, 0x12, 0x15));
+
+        if (GrindOverlay != null)
+            GrindOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
+
+        if (HammerOverlay != null)
+            HammerOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
+
         if (SettingsOverlay != null)
             SettingsOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
     }
@@ -251,206 +289,42 @@ public partial class MainWindow : Window
         decimal taxPct = s.EffectiveTaxRate * 100m;
 
         if (SettingsPayoutRateText != null)
-            SettingsPayoutRateText.Text = $"{payoutPct:N2}%";
+            SettingsPayoutRateText.Text = $"{payoutPct:F2}%";
 
         if (SettingsTaxRateText != null)
-            SettingsTaxRateText.Text = $"-{taxPct:N2}%";
+            SettingsTaxRateText.Text = $"-{taxPct:F2}%";
 
         if (FameBonusLabel != null)
         {
-            if (s.FamilyFame >= 7000)
-                FameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
-            else if (s.FamilyFame >= 4000)
-                FameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
-            else if (s.FamilyFame >= 1000)
-                FameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
-            else
-                FameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
+            decimal famePct = s.GetFameBonusRate() * 100m;
+            FameBonusLabel.Text = $"+{famePct:F1}% ({s.FamilyFame:N0} Fame)";
         }
-
-        if (TaxButton != null)
-            TaxButton.ToolTip = $"Calculate Market Net Profit ({payoutPct:N2}% Payout | -{taxPct:N2}% Tax)";
     }
 
     private void UpdateUI()
     {
-        if (!_isInitialized) return;
-
-        string display = _engine.FormattedDisplay;
         if (MainDisplayText != null)
-        {
-            MainDisplayText.Text = display;
-
-            // Auto-scale font size for huge numbers
-            if (display.Length > 16)
-            {
-                MainDisplayText.FontSize = 20;
-            }
-            else if (display.Length > 12)
-            {
-                MainDisplayText.FontSize = 24;
-            }
-            else
-            {
-                MainDisplayText.FontSize = 32;
-            }
-        }
+            MainDisplayText.Text = _engine.FormattedDisplay;
 
         if (ExpressionTapeText != null)
             ExpressionTapeText.Text = _engine.ExpressionTape;
 
         if (SilverSummaryText != null)
             SilverSummaryText.Text = _engine.SilverSummary;
+
+        if (HudDisplayText != null)
+            HudDisplayText.Text = _engine.FormattedDisplay;
+
+        if (HudSilverText != null)
+            HudSilverText.Text = $"💰 {_engine.SilverSummary}";
     }
 
-    #region Settings Management
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (SettingsOverlay == null) return;
-        SettingsOverlay.Visibility = SettingsOverlay.Visibility == Visibility.Visible
-            ? Visibility.Collapsed
-            : Visibility.Visible;
-    }
-
-    private void CloseSettings_Click(object sender, RoutedEventArgs e)
-    {
-        if (SettingsOverlay != null)
-            SettingsOverlay.Visibility = Visibility.Collapsed;
-        _engine.TaxSettings.Save();
-    }
-
-    private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_isInitialized) return;
-
-        if (OpacityValueLabel != null)
-            OpacityValueLabel.Text = $"{(int)e.NewValue}%";
-
-        _engine.TaxSettings.BackgroundOpacity = e.NewValue;
-        ApplyBackgroundOpacity(e.NewValue);
-        _engine.TaxSettings.Save();
-    }
-
-    private void ButtonOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_isInitialized) return;
-
-        if (ButtonOpacityValueLabel != null)
-            ButtonOpacityValueLabel.Text = $"{(int)e.NewValue}%";
-
-        _engine.TaxSettings.ButtonOpacity = e.NewValue;
-        ApplyButtonOpacity(e.NewValue);
-        _engine.TaxSettings.Save();
-    }
-
-    private void SettingsChanged(object sender, RoutedEventArgs e)
-    {
-        if (!_isInitialized || ValuePackCheckBox == null || MerchantRingCheckBox == null) return;
-
-        _engine.TaxSettings.HasValuePack = ValuePackCheckBox.IsChecked == true;
-        _engine.TaxSettings.HasMerchantRing = MerchantRingCheckBox.IsChecked == true;
-        _engine.TaxSettings.Save();
-
-        UpdateSettingsRatesDisplay();
-    }
-
-    private void FamilyFameTextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (!_isInitialized || FamilyFameTextBox == null) return;
-
-        if (int.TryParse(FamilyFameTextBox.Text, out int fame) && fame >= 0)
-        {
-            _engine.TaxSettings.FamilyFame = fame;
-            _engine.TaxSettings.Save();
-            UpdateSettingsRatesDisplay();
-        }
-    }
-    #endregion
-
-    #region Window Resizing Handlers
-    private void ResizeGripThumb_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        if (double.IsNaN(Width)) Width = ActualWidth;
-        if (double.IsNaN(Height)) Height = ActualHeight;
-
-        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
-        Height = Math.Max(MinHeight, Height + e.VerticalChange);
-    }
-
-    private void ResizeRight_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        if (double.IsNaN(Width)) Width = ActualWidth;
-        Width = Math.Max(MinWidth, Width + e.HorizontalChange);
-    }
-
-    private void ResizeBottom_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        if (double.IsNaN(Height)) Height = ActualHeight;
-        Height = Math.Max(MinHeight, Height + e.VerticalChange);
-    }
-
-    private void ResizeLeft_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        if (double.IsNaN(Width)) Width = ActualWidth;
-        double newWidth = Math.Max(MinWidth, Width - e.HorizontalChange);
-        if (newWidth > MinWidth)
-        {
-            Left += e.HorizontalChange;
-            Width = newWidth;
-        }
-    }
-
-    private void ResizeTop_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        if (double.IsNaN(Height)) Height = ActualHeight;
-        double newHeight = Math.Max(MinHeight, Height - e.VerticalChange);
-        if (newHeight > MinHeight)
-        {
-            Top += e.VerticalChange;
-            Height = newHeight;
-        }
-    }
-
-    private void ResizeBottomLeft_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        ResizeLeft_DragDelta(sender, e);
-        ResizeBottom_DragDelta(sender, e);
-    }
-
-    private void ResizeTopRight_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        ResizeRight_DragDelta(sender, e);
-        ResizeTop_DragDelta(sender, e);
-    }
-
-    private void ResizeTopLeft_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        ResizeLeft_DragDelta(sender, e);
-        ResizeTop_DragDelta(sender, e);
-    }
-    #endregion
-
-    #region Window Titlebar Controls
+    #region Window Title Bar & Resizing
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed)
+        if (e.ButtonState == MouseButtonState.Pressed)
         {
             DragMove();
-        }
-    }
-
-    private void PinButton_Click(object sender, RoutedEventArgs e)
-    {
-        Topmost = !Topmost;
-        if (Topmost)
-        {
-            PinIcon.Foreground = (SolidColorBrush)FindResource("AccentCron");
-            PinButton.ToolTip = "Always on Top (Enabled)";
-        }
-        else
-        {
-            PinIcon.Foreground = (SolidColorBrush)FindResource("TextSecondary");
-            PinButton.ToolTip = "Always on Top (Disabled)";
         }
     }
 
@@ -463,14 +337,376 @@ public partial class MainWindow : Window
     {
         Close();
     }
+
+    private void PinButton_Click(object sender, RoutedEventArgs e)
+    {
+        Topmost = !Topmost;
+        if (PinIcon != null)
+        {
+            PinIcon.Foreground = Topmost ? (Brush)FindResource("AccentCron") : (Brush)FindResource("TextSecondary");
+        }
+        if (PinButton != null)
+        {
+            PinButton.ToolTip = Topmost ? "Always on Top (Enabled)" : "Always on Top (Disabled)";
+        }
+    }
+
+    private void HudButton_Click(object sender, RoutedEventArgs e)
+    {
+        ToggleHudMode();
+    }
+
+    private void ToggleHudMode()
+    {
+        _isHudMode = !_isHudMode;
+
+        if (_isHudMode)
+        {
+            // Enter HUD mini mode
+            _preHudWidth = ActualWidth;
+            _preHudHeight = ActualHeight;
+
+            StandardView.Visibility = Visibility.Collapsed;
+            SettingsOverlay.Visibility = Visibility.Collapsed;
+            GrindOverlay.Visibility = Visibility.Collapsed;
+            HammerOverlay.Visibility = Visibility.Collapsed;
+            HudView.Visibility = Visibility.Visible;
+
+            MinHeight = 54;
+            Height = 84;
+            Width = Math.Max(320, Width * 0.9);
+            Topmost = true;
+        }
+        else
+        {
+            // Restore standard mode
+            HudView.Visibility = Visibility.Collapsed;
+            StandardView.Visibility = Visibility.Visible;
+
+            MinHeight = 450;
+            Width = _preHudWidth;
+            Height = _preHudHeight;
+        }
+
+        UpdateUI();
+    }
+
+    private void ResizeGripThumb_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        double newWidth = ActualWidth + e.HorizontalChange;
+        double newHeight = ActualHeight + e.VerticalChange;
+
+        if (newWidth >= MinWidth)
+            Width = newWidth;
+        if (newHeight >= MinHeight)
+            Height = newHeight;
+    }
+
+    private void ResizeRight_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        double newWidth = ActualWidth + e.HorizontalChange;
+        if (newWidth >= MinWidth) Width = newWidth;
+    }
+
+    private void ResizeBottom_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        double newHeight = ActualHeight + e.VerticalChange;
+        if (newHeight >= MinHeight) Height = newHeight;
+    }
+
+    private void ResizeLeft_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        double newWidth = ActualWidth - e.HorizontalChange;
+        if (newWidth >= MinWidth)
+        {
+            Left += e.HorizontalChange;
+            Width = newWidth;
+        }
+    }
+
+    private void ResizeTop_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        double newHeight = ActualHeight - e.VerticalChange;
+        if (newHeight >= MinHeight)
+        {
+            Top += e.VerticalChange;
+            Height = newHeight;
+        }
+    }
+
+    private void ResizeBottomLeft_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        ResizeBottom_DragDelta(sender, e);
+        ResizeLeft_DragDelta(sender, e);
+    }
+
+    private void ResizeTopRight_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        ResizeTop_DragDelta(sender, e);
+        ResizeRight_DragDelta(sender, e);
+    }
+
+    private void ResizeTopLeft_DragDelta(object sender, DragDeltaEventArgs e)
+    {
+        ResizeTop_DragDelta(sender, e);
+        ResizeLeft_DragDelta(sender, e);
+    }
     #endregion
 
-    #region Calculator Actions
+    #region Grind Spot Trash Calculator
+    private void GrindToolButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (GrindOverlay == null) return;
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+        HammerOverlay.Visibility = Visibility.Collapsed;
+        GrindOverlay.Visibility = GrindOverlay.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (GrindOverlay.Visibility == Visibility.Visible)
+        {
+            RecalculateGrindLoot();
+        }
+    }
+
+    private void CloseGrindOverlay_Click(object sender, RoutedEventArgs e)
+    {
+        if (GrindOverlay != null) GrindOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void GrindSpotComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (GrindSpotComboBox.SelectedItem is GrindSpot spot)
+        {
+            if (GrindSpotInfoLabel != null)
+                GrindSpotInfoLabel.Text = $"Recommended: {spot.RecommendedApDp}";
+            if (GrindRegionLabel != null)
+                GrindRegionLabel.Text = $"Region: {spot.Region}";
+            if (TrashPriceTextBox != null)
+                TrashPriceTextBox.Text = spot.TrashPrice.ToString(CultureInfo.InvariantCulture);
+
+            RecalculateGrindLoot();
+        }
+    }
+
+    private void TrashInputs_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isInitialized) return;
+        RecalculateGrindLoot();
+    }
+
+    private void AddTrash_5k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(5_000);
+    private void AddTrash_10k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(10_000);
+    private void AddTrash_20k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(20_000);
+    private void AddTrash_50k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(50_000);
+
+    private void ClearTrash_Click(object sender, RoutedEventArgs e)
+    {
+        if (TrashCountTextBox != null) TrashCountTextBox.Text = "0";
+        if (ExtraSilverTextBox != null) ExtraSilverTextBox.Text = "0";
+        RecalculateGrindLoot();
+    }
+
+    private void AddTrashAmount(decimal amount)
+    {
+        if (TrashCountTextBox == null) return;
+        if (decimal.TryParse(TrashCountTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal cur))
+        {
+            TrashCountTextBox.Text = (cur + amount).ToString(CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            TrashCountTextBox.Text = amount.ToString(CultureInfo.InvariantCulture);
+        }
+        RecalculateGrindLoot();
+    }
+
+    private void RecalculateGrindLoot()
+    {
+        if (TrashCountTextBox == null || TrashPriceTextBox == null || GrindTotalSilverText == null) return;
+
+        decimal.TryParse(TrashCountTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal trashCount);
+        decimal.TryParse(TrashPriceTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal unitPrice);
+        decimal.TryParse(ExtraSilverTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal extraSilver);
+
+        decimal trashSilver = GrindSpotDatabase.CalculateTrashSilver(trashCount, unitPrice);
+        decimal totalSilver = trashSilver + Math.Max(0m, extraSilver);
+
+        GrindTotalSilverText.Text = $"{totalSilver:N0} Silver";
+        if (GrindFormattedSummaryText != null)
+        {
+            string detail = extraSilver > 0 ? $" (Trash: {trashSilver:N0} + Extra: {extraSilver:N0})" : "";
+            GrindFormattedSummaryText.Text = $"{CalculatorEngine.FormatSilverSummary(totalSilver)}{detail}";
+        }
+    }
+
+    private void SendGrindToCalc_Click(object sender, RoutedEventArgs e)
+    {
+        decimal.TryParse(TrashCountTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal trashCount);
+        decimal.TryParse(TrashPriceTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal unitPrice);
+        decimal.TryParse(ExtraSilverTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal extraSilver);
+
+        decimal totalSilver = GrindSpotDatabase.CalculateTrashSilver(trashCount, unitPrice) + Math.Max(0m, extraSilver);
+
+        string spotName = (GrindSpotComboBox?.SelectedItem as GrindSpot)?.Name ?? "Grind Loot";
+        _engine.SetCurrentValue(totalSilver, $"{spotName} ({trashCount:N0} Trash) =");
+
+        if (GrindOverlay != null) GrindOverlay.Visibility = Visibility.Collapsed;
+        UpdateUI();
+    }
+    #endregion
+
+    #region Hammer vs. Cron Tool
+    private void HammerToolButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (HammerOverlay == null) return;
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+        GrindOverlay.Visibility = Visibility.Collapsed;
+        HammerOverlay.Visibility = HammerOverlay.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (HammerOverlay.Visibility == Visibility.Visible)
+        {
+            RecalculateHammerComparison();
+        }
+    }
+
+    private void CloseHammerOverlay_Click(object sender, RoutedEventArgs e)
+    {
+        if (HammerOverlay != null) HammerOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void HammerTargetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (HammerTargetComboBox.SelectedItem is HammerTarget target)
+        {
+            if (HammerTargetInfoLabel != null)
+                HammerTargetInfoLabel.Text = $"{target.Category} • {target.Description}";
+
+            RecalculateHammerComparison();
+        }
+    }
+
+    private void HammerPrice_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isInitialized) return;
+        RecalculateHammerComparison();
+    }
+
+    private void RecalculateHammerComparison()
+    {
+        if (HammerTargetComboBox == null || HammerPriceTextBox == null) return;
+
+        if (HammerTargetComboBox.SelectedItem is not HammerTarget target) return;
+
+        decimal.TryParse(HammerPriceTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal hammerPrice);
+
+        var result = HammerComparisonEngine.Compare(target, hammerPrice);
+
+        if (HammerVendorCostLabel != null)
+            HammerVendorCostLabel.Text = $"{result.VendorCronCost / 1_000_000_000m:F2} B";
+
+        if (HammerOutfitCostLabel != null)
+            HammerOutfitCostLabel.Text = $"{result.OutfitCronCost / 1_000_000_000m:F2} B";
+
+        if (HammerMarketCostLabel != null)
+            HammerMarketCostLabel.Text = $"{hammerPrice / 1_000_000_000m:F2} B";
+
+        if (HammerRecommendationText != null)
+            HammerRecommendationText.Text = result.Recommendation;
+
+        if (HammerRecommendationBorder != null)
+        {
+            if (hammerPrice < result.OutfitCronCost)
+                HammerRecommendationBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0x4c, 0xaf, 0x50)); // Green
+            else if (hammerPrice < result.VendorCronCost)
+                HammerRecommendationBorder.BorderBrush = (Brush)FindResource("AccentGold"); // Yellow/Gold
+            else
+                HammerRecommendationBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0xff, 0x52, 0x52)); // Red
+        }
+    }
+
+    private void SendHammerToCalc_Click(object sender, RoutedEventArgs e)
+    {
+        if (HammerTargetComboBox?.SelectedItem is not HammerTarget target) return;
+
+        decimal.TryParse(HammerPriceTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal hammerPrice);
+        var result = HammerComparisonEngine.Compare(target, hammerPrice);
+
+        // Pipe the Vendor Cron cost or Hammer price into the main calculator
+        _engine.SetCurrentValue(result.VendorCronCost, $"{target.Name} (Vendor Crons) =");
+
+        if (HammerOverlay != null) HammerOverlay.Visibility = Visibility.Collapsed;
+        UpdateUI();
+    }
+    #endregion
+
+    #region Settings Overlay & Sliders
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        GrindOverlay.Visibility = Visibility.Collapsed;
+        HammerOverlay.Visibility = Visibility.Collapsed;
+        SettingsOverlay.Visibility = SettingsOverlay.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void CloseSettings_Click(object sender, RoutedEventArgs e)
+    {
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void SettingsChanged(object sender, RoutedEventArgs e)
+    {
+        if (!_isInitialized) return;
+
+        _engine.TaxSettings.HasValuePack = ValuePackCheckBox.IsChecked ?? true;
+        _engine.TaxSettings.HasMerchantRing = MerchantRingCheckBox.IsChecked ?? false;
+        _engine.TaxSettings.Save();
+
+        UpdateSettingsRatesDisplay();
+    }
+
+    private void FamilyFameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isInitialized) return;
+
+        if (int.TryParse(FamilyFameTextBox.Text, out int fame))
+        {
+            _engine.TaxSettings.FamilyFame = Math.Max(0, fame);
+            _engine.TaxSettings.Save();
+            UpdateSettingsRatesDisplay();
+        }
+    }
+
+    private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_isInitialized) return;
+
+        double val = Math.Round(e.NewValue);
+        _engine.TaxSettings.BackgroundOpacity = val;
+        _engine.TaxSettings.Save();
+
+        if (OpacityValueLabel != null)
+            OpacityValueLabel.Text = $"{(int)val}%";
+
+        ApplyBackgroundOpacity(val);
+    }
+
+    private void ButtonOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_isInitialized) return;
+
+        double val = Math.Round(e.NewValue);
+        _engine.TaxSettings.ButtonOpacity = val;
+        _engine.TaxSettings.Save();
+
+        if (ButtonOpacityValueLabel != null)
+            ButtonOpacityValueLabel.Text = $"{(int)val}%";
+
+        ApplyButtonOpacity(val);
+    }
+    #endregion
+
+    #region Calculator Button Handlers
     private void Digit_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button btn && btn.Tag is string tag && tag.Length > 0)
+        if (sender is Button btn && btn.Tag is string digitStr && digitStr.Length > 0)
         {
-            _engine.InputDigit(tag[0]);
+            _engine.InputDigit(digitStr[0]);
             UpdateUI();
         }
     }
@@ -557,6 +793,8 @@ public partial class MainWindow : Window
             string copyText = $"{_engine.CurrentValue:N0} Silver ({_engine.SilverSummary})";
             Clipboard.SetText(copyText);
             SilverSummaryText.Text = "✓ Copied to Clipboard!";
+            if (HudSilverText != null)
+                HudSilverText.Text = "✓ Copied!";
         }
         catch
         {
@@ -577,6 +815,11 @@ public partial class MainWindow : Window
 
         switch (e.Key)
         {
+            case Key.H or Key.F9:
+                ToggleHudMode();
+                e.Handled = true;
+                return;
+
             case Key.D0 or Key.NumPad0:
                 _engine.InputDigit('0');
                 break;
@@ -643,6 +886,24 @@ public partial class MainWindow : Window
                     e.Handled = true;
                     return;
                 }
+                if (GrindOverlay.Visibility == Visibility.Visible)
+                {
+                    GrindOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    return;
+                }
+                if (HammerOverlay.Visibility == Visibility.Visible)
+                {
+                    HammerOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    return;
+                }
+                if (_isHudMode)
+                {
+                    ToggleHudMode();
+                    e.Handled = true;
+                    return;
+                }
                 _engine.Clear();
                 break;
 
@@ -661,12 +922,10 @@ public partial class MainWindow : Window
                 break;
 
             case Key.T when Keyboard.Modifiers == ModifierKeys.None:
-                // Pressing T triggers Tax calculation!
                 _engine.CalculateMarketTax();
                 break;
 
             case Key.C when Keyboard.Modifiers == ModifierKeys.None:
-                // Pressing C triggers Cron calculation!
                 _engine.CalculateCronCost(CalculatorEngine.DefaultVendorCronPrice);
                 break;
 
