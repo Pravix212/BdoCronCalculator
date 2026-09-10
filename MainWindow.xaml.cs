@@ -9,10 +9,12 @@ namespace BdoCronCalculator;
 public partial class MainWindow : Window
 {
     private readonly CalculatorEngine _engine = new();
+    private bool _isInitialized = false;
 
     public MainWindow()
     {
         InitializeComponent();
+        _isInitialized = true;
         LoadSettingsIntoUI();
         UpdateUI();
     }
@@ -20,60 +22,77 @@ public partial class MainWindow : Window
     private void LoadSettingsIntoUI()
     {
         var s = _engine.TaxSettings;
-        ValuePackCheckBox.IsChecked = s.HasValuePack;
-        MerchantRingCheckBox.IsChecked = s.HasMerchantRing;
-        FamilyFameTextBox.Text = s.FamilyFame.ToString();
+        if (ValuePackCheckBox != null) ValuePackCheckBox.IsChecked = s.HasValuePack;
+        if (MerchantRingCheckBox != null) MerchantRingCheckBox.IsChecked = s.HasMerchantRing;
+        if (FamilyFameTextBox != null) FamilyFameTextBox.Text = s.FamilyFame.ToString();
         UpdateSettingsRatesDisplay();
     }
 
     private void UpdateSettingsRatesDisplay()
     {
+        if (!_isInitialized) return;
+
         var s = _engine.TaxSettings;
         decimal payoutPct = s.EffectivePayoutRate * 100m;
         decimal taxPct = s.EffectiveTaxRate * 100m;
-        decimal fameBonus = s.GetFameBonusRate() * 100m;
 
-        SettingsPayoutRateText.Text = $"{payoutPct:N2}%";
-        SettingsTaxRateText.Text = $"-{taxPct:N2}%";
+        if (SettingsPayoutRateText != null)
+            SettingsPayoutRateText.Text = $"{payoutPct:N2}%";
 
-        if (s.FamilyFame >= 7000)
-            FameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
-        else if (s.FamilyFame >= 4000)
-            FameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
-        else if (s.FamilyFame >= 1000)
-            FameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
-        else
-            FameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
+        if (SettingsTaxRateText != null)
+            SettingsTaxRateText.Text = $"-{taxPct:N2}%";
 
-        TaxButton.ToolTip = $"Calculate Market Net Profit ({payoutPct:N2}% Payout | -{taxPct:N2}% Tax)";
+        if (FameBonusLabel != null)
+        {
+            if (s.FamilyFame >= 7000)
+                FameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
+            else if (s.FamilyFame >= 4000)
+                FameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
+            else if (s.FamilyFame >= 1000)
+                FameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
+            else
+                FameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
+        }
+
+        if (TaxButton != null)
+            TaxButton.ToolTip = $"Calculate Market Net Profit ({payoutPct:N2}% Payout | -{taxPct:N2}% Tax)";
     }
 
     private void UpdateUI()
     {
+        if (!_isInitialized) return;
+
         string display = _engine.FormattedDisplay;
-        MainDisplayText.Text = display;
+        if (MainDisplayText != null)
+        {
+            MainDisplayText.Text = display;
 
-        // Auto-scale font size for huge numbers
-        if (display.Length > 16)
-        {
-            MainDisplayText.FontSize = 20;
-        }
-        else if (display.Length > 12)
-        {
-            MainDisplayText.FontSize = 24;
-        }
-        else
-        {
-            MainDisplayText.FontSize = 32;
+            // Auto-scale font size for huge numbers
+            if (display.Length > 16)
+            {
+                MainDisplayText.FontSize = 20;
+            }
+            else if (display.Length > 12)
+            {
+                MainDisplayText.FontSize = 24;
+            }
+            else
+            {
+                MainDisplayText.FontSize = 32;
+            }
         }
 
-        ExpressionTapeText.Text = _engine.ExpressionTape;
-        SilverSummaryText.Text = _engine.SilverSummary;
+        if (ExpressionTapeText != null)
+            ExpressionTapeText.Text = _engine.ExpressionTape;
+
+        if (SilverSummaryText != null)
+            SilverSummaryText.Text = _engine.SilverSummary;
     }
 
     #region Settings Management
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
+        if (SettingsOverlay == null) return;
         SettingsOverlay.Visibility = SettingsOverlay.Visibility == Visibility.Visible
             ? Visibility.Collapsed
             : Visibility.Visible;
@@ -81,13 +100,14 @@ public partial class MainWindow : Window
 
     private void CloseSettings_Click(object sender, RoutedEventArgs e)
     {
-        SettingsOverlay.Visibility = Visibility.Collapsed;
+        if (SettingsOverlay != null)
+            SettingsOverlay.Visibility = Visibility.Collapsed;
         _engine.TaxSettings.Save();
     }
 
     private void SettingsChanged(object sender, RoutedEventArgs e)
     {
-        if (ValuePackCheckBox == null || MerchantRingCheckBox == null) return;
+        if (!_isInitialized || ValuePackCheckBox == null || MerchantRingCheckBox == null) return;
 
         _engine.TaxSettings.HasValuePack = ValuePackCheckBox.IsChecked == true;
         _engine.TaxSettings.HasMerchantRing = MerchantRingCheckBox.IsChecked == true;
@@ -98,7 +118,7 @@ public partial class MainWindow : Window
 
     private void FamilyFameTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (FamilyFameTextBox == null) return;
+        if (!_isInitialized || FamilyFameTextBox == null) return;
 
         if (int.TryParse(FamilyFameTextBox.Text, out int fame) && fame >= 0)
         {

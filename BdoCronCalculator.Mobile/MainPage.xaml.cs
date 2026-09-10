@@ -5,10 +5,12 @@ namespace BdoCronCalculator.Mobile;
 public partial class MainPage : ContentPage
 {
     private readonly CalculatorEngine _engine = new();
+    private bool _isInitialized = false;
 
     public MainPage()
     {
         InitializeComponent();
+        _isInitialized = true;
         LoadSettingsIntoUI();
         UpdateUI();
     }
@@ -16,51 +18,67 @@ public partial class MainPage : ContentPage
     private void LoadSettingsIntoUI()
     {
         var s = _engine.TaxSettings;
-        ValuePackSwitch.IsToggled = s.HasValuePack;
-        MerchantRingSwitch.IsToggled = s.HasMerchantRing;
-        FamilyFameEntry.Text = s.FamilyFame.ToString();
+        if (ValuePackSwitch != null) ValuePackSwitch.IsToggled = s.HasValuePack;
+        if (MerchantRingSwitch != null) MerchantRingSwitch.IsToggled = s.HasMerchantRing;
+        if (FamilyFameEntry != null) FamilyFameEntry.Text = s.FamilyFame.ToString();
         UpdateSettingsRatesDisplay();
     }
 
     private void UpdateSettingsRatesDisplay()
     {
+        if (!_isInitialized) return;
+
         var s = _engine.TaxSettings;
         decimal payoutPct = s.EffectivePayoutRate * 100m;
         decimal taxPct = s.EffectiveTaxRate * 100m;
 
-        MobilePayoutRateLabel.Text = $"{payoutPct:N2}%";
-        MobileTaxRateLabel.Text = $"-{taxPct:N2}%";
+        if (MobilePayoutRateLabel != null)
+            MobilePayoutRateLabel.Text = $"{payoutPct:N2}%";
 
-        if (s.FamilyFame >= 7000)
-            MobileFameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
-        else if (s.FamilyFame >= 4000)
-            MobileFameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
-        else if (s.FamilyFame >= 1000)
-            MobileFameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
-        else
-            MobileFameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
+        if (MobileTaxRateLabel != null)
+            MobileTaxRateLabel.Text = $"-{taxPct:N2}%";
+
+        if (MobileFameBonusLabel != null)
+        {
+            if (s.FamilyFame >= 7000)
+                MobileFameBonusLabel.Text = "+1.5% (≥ 7,000 Fame)";
+            else if (s.FamilyFame >= 4000)
+                MobileFameBonusLabel.Text = "+1.0% (4,000 - 6,999 Fame)";
+            else if (s.FamilyFame >= 1000)
+                MobileFameBonusLabel.Text = "+0.5% (1,000 - 3,999 Fame)";
+            else
+                MobileFameBonusLabel.Text = "+0.0% (< 1,000 Fame)";
+        }
     }
 
     private void UpdateUI()
     {
+        if (!_isInitialized) return;
+
         string display = _engine.FormattedDisplay;
-        MainDisplayLabel.Text = display;
+        if (MainDisplayLabel != null)
+        {
+            MainDisplayLabel.Text = display;
 
-        if (display.Length > 15)
-        {
-            MainDisplayLabel.FontSize = 22;
-        }
-        else if (display.Length > 11)
-        {
-            MainDisplayLabel.FontSize = 28;
-        }
-        else
-        {
-            MainDisplayLabel.FontSize = 34;
+            if (display.Length > 15)
+            {
+                MainDisplayLabel.FontSize = 22;
+            }
+            else if (display.Length > 11)
+            {
+                MainDisplayLabel.FontSize = 28;
+            }
+            else
+            {
+                MainDisplayLabel.FontSize = 34;
+            }
         }
 
-        ExpressionTapeLabel.Text = _engine.ExpressionTape;
-        SilverSummaryLabel.Text = _engine.SilverSummary;
+        if (ExpressionTapeLabel != null)
+            ExpressionTapeLabel.Text = _engine.ExpressionTape;
+
+        if (SilverSummaryLabel != null)
+            SilverSummaryLabel.Text = _engine.SilverSummary;
     }
 
     private void TriggerHaptic()
