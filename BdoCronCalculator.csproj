@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -21,6 +21,10 @@
     <EmbeddedResource Remove="BdoCronCalculator.Tests\**\*" />
     <None Remove="BdoCronCalculator.Tests\**\*" />
     <Page Remove="BdoCronCalculator.Tests\**\*" />
+    <Compile Remove="BdoCronCalculator.Mobile\**\*" />
+    <EmbeddedResource Remove="BdoCronCalculator.Mobile\**\*" />
+    <None Remove="BdoCronCalculator.Mobile\**\*" />
+    <Page Remove="BdoCronCalculator.Mobile\**\*" />
     <Compile Remove="Publish\**\*" />
     <None Remove="Publish\**\*" />
   </ItemGroup>

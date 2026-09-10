@@ -1,4 +1,4 @@
-﻿# Black Desert Cron Stone Calculator
+# Black Desert Cron Stone Calculator
 
 A lightweight, always-on-top desktop calculator built for Black Desert Online players. It streamlines enhancement cost calculations, provides instant conversions for vendor and outfit-extracted Cron Stones, and dynamically formats large silver amounts into readable units (Millions, Billions, Trillions).
 
@@ -48,11 +48,17 @@ A lightweight, always-on-top desktop calculator built for Black Desert Online pl
 
 ## Installation & Downloads
 
-Pre-compiled standalone binaries are available on the [Releases](../../releases/latest) page.
+Pre-compiled standalone packages for Windows and Android are available on the [Releases](../../releases/latest) page.
 
-1. Download `BdoCronCalculator.exe` or `BdoCronCalculator-Portable.zip`.
-2. Extract or run the executable directly (no installer required).
+### Windows Desktop (.exe)
+1. Download `BdoCronCalculator.exe` or `BdoCronCalculator-Windows.zip`.
+2. Run `BdoCronCalculator.exe` directly (portable, no installer needed).
 3. *(Optional)* Right-click `BdoCronCalculator.exe` and select **Pin to taskbar**.
+
+### Android Mobile (.apk)
+1. Download `BdoCronCalculator.apk` on your Android device.
+2. Open the downloaded file and tap **Install** (if prompted, allow installs from your browser/file manager).
+3. Open **BDO Cron Calculator** from your app drawer.
 
 ---
 

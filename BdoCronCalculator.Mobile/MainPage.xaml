@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BdoCronCalculator.Mobile.MainPage"
+             BackgroundColor="#131518">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto" Padding="12, 16, 12, 16" RowSpacing="10">
+        
+        <!-- 1. Header Bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" VerticalOptions="Center" Margin="4, 0, 4, 4">
+            <Image Grid.Column="0" Source="cronstone.png" WidthRequest="26" HeightRequest="26" Margin="0,0,8,0" VerticalOptions="Center" />
+            <HorizontalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                <Label Text="BDO" FontAttributes="Bold" TextColor="#00e5ff" FontSize="18" VerticalOptions="Center" />
+                <Label Text="Cron Calculator" FontAttributes="Bold" TextColor="#f0f3f6" FontSize="18" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- 2. Display Section -->
+        <Border Grid.Row="1" BackgroundColor="#101215" Stroke="#2d333d" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="16, 12">
+            <VerticalStackLayout Spacing="4">
+                <!-- Expression Tape -->
+                <Label x:Name="ExpressionTapeLabel"
+                       Text=""
+                       TextColor="#8a94a2"
+                       FontSize="14"
+                       HorizontalTextAlignment="End"
+                       LineBreakMode="TailTruncation" />
+
+                <!-- Main Number Display -->
+                <Label x:Name="MainDisplayLabel"
+                       Text="0"
+                       TextColor="#f0f3f6"
+                       FontSize="34"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="End"
+                       LineBreakMode="TailTruncation" />
+
+                <!-- Silver Summary -->
+                <Border BackgroundColor="#1b2028" Stroke="#2d333d" StrokeShape="RoundRectangle 6" Padding="10, 4" HorizontalOptions="End" Margin="0, 4, 0, 0">
+                    <HorizontalStackLayout Spacing="4">
+                        <Label Text="💰" FontSize="12" VerticalOptions="Center" />
+                        <Label x:Name="SilverSummaryLabel" Text="0 Silver" TextColor="#ffc107" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- 3. Cron Buttons Row -->
+        <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="8">
+            <Button Grid.Column="0"
+                    Text="CRON (3M)"
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    TextColor="#00e5ff"
+                    BackgroundColor="#123545"
+                    BorderColor="#00b4d8"
+                    BorderWidth="1.5"
+                    CornerRadius="8"
+                    HeightRequest="48"
+                    Clicked="OnCronClicked" />
+
+            <Button Grid.Column="1"
+                    Text="Outfit (2.18M)"
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    TextColor="#f0f3f6"
+                    BackgroundColor="#252a32"
+                    BorderColor="#2d333d"
+                    BorderWidth="1"
+                    CornerRadius="8"
+                    HeightRequest="48"
+                    Clicked="OnOutfitCronClicked" />
+        </Grid>
+
+        <!-- 4. Keypad Grid -->
+        <Grid Grid.Row="3" RowDefinitions="*, *, *, *, *" ColumnDefinitions="*, *, *, *" RowSpacing="6" ColumnSpacing="6">
+            <!-- Row 0 -->
+            <Button Grid.Row="0" Grid.Column="0" Text="C" TextColor="#ff6b6b" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="18" Clicked="OnClearClicked" />
+            <Button Grid.Row="0" Grid.Column="1" Text="CE" TextColor="#ffab40" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="18" Clicked="OnClearEntryClicked" />
+            <Button Grid.Row="0" Grid.Column="2" Text="⌫" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="18" Clicked="OnBackspaceClicked" />
+            <Button Grid.Row="0" Grid.Column="3" Text="÷" TextColor="#00e5ff" BackgroundColor="#202b38" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnOperatorClicked" CommandParameter="÷" />
+
+            <!-- Row 1 -->
+            <Button Grid.Row="1" Grid.Column="0" Text="7" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="7" />
+            <Button Grid.Row="1" Grid.Column="1" Text="8" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="8" />
+            <Button Grid.Row="1" Grid.Column="2" Text="9" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="9" />
+            <Button Grid.Row="1" Grid.Column="3" Text="×" TextColor="#00e5ff" BackgroundColor="#202b38" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnOperatorClicked" CommandParameter="×" />
+
+            <!-- Row 2 -->
+            <Button Grid.Row="2" Grid.Column="0" Text="4" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="4" />
+            <Button Grid.Row="2" Grid.Column="1" Text="5" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="5" />
+            <Button Grid.Row="2" Grid.Column="2" Text="6" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="6" />
+            <Button Grid.Row="2" Grid.Column="3" Text="-" TextColor="#00e5ff" BackgroundColor="#202b38" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnOperatorClicked" CommandParameter="-" />
+
+            <!-- Row 3 -->
+            <Button Grid.Row="3" Grid.Column="0" Text="1" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="1" />
+            <Button Grid.Row="3" Grid.Column="1" Text="2" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="2" />
+            <Button Grid.Row="3" Grid.Column="2" Text="3" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="3" />
+            <Button Grid.Row="3" Grid.Column="3" Text="+" TextColor="#00e5ff" BackgroundColor="#202b38" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnOperatorClicked" CommandParameter="+" />
+
+            <!-- Row 4 -->
+            <Button Grid.Row="4" Grid.Column="0" Text="±" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="18" Clicked="OnNegateClicked" />
+            <Button Grid.Row="4" Grid.Column="1" Text="0" TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="0" />
+            <Button Grid.Row="4" Grid.Column="2" Text="." TextColor="#f0f3f6" BackgroundColor="#252a32" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnDigitClicked" CommandParameter="." />
+            <Button Grid.Row="4" Grid.Column="3" Text="=" TextColor="#ffffff" BackgroundColor="#00838f" CornerRadius="8" FontAttributes="Bold" FontSize="20" Clicked="OnEqualsClicked" />
+        </Grid>
+
+        <!-- 5. Quick Multipliers / Copy Bar -->
+        <Grid Grid.Row="4" ColumnDefinitions="*, *, *, *" ColumnSpacing="6">
+            <Button Grid.Column="0" Text="+k" TextColor="#f0f3f6" BackgroundColor="#1c1f24" BorderColor="#2d333d" BorderWidth="1" CornerRadius="6" FontSize="13" HeightRequest="40" Clicked="OnMultiplyKClicked" />
+            <Button Grid.Column="1" Text="+M" TextColor="#f0f3f6" BackgroundColor="#1c1f24" BorderColor="#2d333d" BorderWidth="1" CornerRadius="6" FontSize="13" HeightRequest="40" Clicked="OnMultiplyMClicked" />
+            <Button Grid.Column="2" Text="+B" TextColor="#f0f3f6" BackgroundColor="#1c1f24" BorderColor="#2d333d" BorderWidth="1" CornerRadius="6" FontSize="13" HeightRequest="40" Clicked="OnMultiplyBClicked" />
+            <Button Grid.Column="3" Text="📋 Copy" TextColor="#f0f3f6" BackgroundColor="#1c1f24" BorderColor="#2d333d" BorderWidth="1" CornerRadius="6" FontSize="13" HeightRequest="40" Clicked="OnCopyClicked" />
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

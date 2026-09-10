@@ -1,4 +1,4 @@
-﻿name: Build and Release BDO Cron Calculator
+﻿name: Build and Release
 
 on:
   push:
@@ -10,7 +10,8 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  build-windows:
+    name: Build Windows Desktop (.exe)
     runs-on: windows-latest
 
     steps:
@@ -22,28 +23,86 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore BdoCronCalculator.csproj
-        working-directory: .
-
       - name: Run Unit Tests
         run: dotnet test BdoCronCalculator.Tests/BdoCronCalculator.Tests.csproj -c Release
-        working-directory: .
 
-      - name: Publish Standalone Portable Executable
+      - name: Publish Windows Standalone Executable
         run: |
-          dotnet publish BdoCronCalculator.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/
-        working-directory: .
+          dotnet publish BdoCronCalculator.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o win-publish/
 
       - name: Create ZIP Package
         run: |
-          Compress-Archive -Path publish/* -DestinationPath BdoCronCalculator-Portable.zip
+          Compress-Archive -Path win-publish/* -DestinationPath BdoCronCalculator-Windows.zip
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: |
+            win-publish/BdoCronCalculator.exe
+            BdoCronCalculator-Windows.zip
+
+  build-android:
+    name: Build Android Mobile (.apk)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install .NET MAUI & Android Workload
+        run: dotnet workload install maui-android
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+
+      - name: Build & Publish Android APK
+        run: |
+          dotnet publish BdoCronCalculator.Mobile/BdoCronCalculator.Mobile.csproj -f net9.0-android -c Release -p:AndroidPackageFormat=apk -o android-publish/
+
+      - name: Copy & Rename APK
+        run: |
+          $apk = Get-ChildItem -Path android-publish -Filter *.apk -Recurse | Select-Object -First 1
+          Copy-Item $apk.FullName -Destination "BdoCronCalculator.apk"
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: BdoCronCalculator.apk
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-android]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+          path: release-files/
+
+      - name: Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-release
+          path: release-files/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            BdoCronCalculator-Portable.zip
-            publish/BdoCronCalculator.exe
+            release-files/BdoCronCalculator.exe
+            release-files/BdoCronCalculator-Windows.zip
+            release-files/BdoCronCalculator.apk
           generate_release_notes: true
