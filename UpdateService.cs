@@ -33,7 +33,7 @@ public class UpdateService
     public static Version GetCurrentVersion()
     {
         var ver = Assembly.GetExecutingAssembly().GetName().Version;
-        return ver ?? new Version(1, 3, 2);
+        return ver ?? new Version(1, 3, 3);
     }
 
     public static async Task<UpdateInfo?> CheckForUpdatesAsync()

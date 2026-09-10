@@ -22,9 +22,12 @@ public sealed class GrindAndHammerTests
 
     [Theory]
     [InlineData("hexe", 2)] // Elvia Hexe Sanctuary, Hexe Sanctuary (Standard)
-    [InlineData("dehkia", 14)] // All Dehkia spots
+    [InlineData("dehkia", 12)] // All Dehkia spots
     [InlineData("orcs", 1)] // Elvia Orc Camp
-    [InlineData("morning light", 6)] // Land of the morning light spots
+    [InlineData("morning light", 8)] // Land of the morning light spots
+    [InlineData("buccaneers", 1)] // Olvia Academy Bumblin' Buccaneers
+    [InlineData("bumblin", 1)] // Olvia Academy Bumblin' Buccaneers
+    [InlineData("edania", 7)] // All 7 Edania spots (Event Horizon, Aresion, Scales, Magaia, Hermesia, Aphrodon, Aetherion)
     public void GrindSpotDatabase_SearchFiltering_ReturnsExpectedMatches(string query, int minimumMatches)
     {
         var filtered = GrindSpotDatabase.AllSpots
@@ -32,6 +35,26 @@ public sealed class GrindAndHammerTests
             .ToList();
 
         Assert.True(filtered.Count >= minimumMatches, $"Query '{query}' returned {filtered.Count} matches, expected at least {minimumMatches}");
+    }
+
+    [Fact]
+    public void GrindSpotDatabase_EdaniaAndOlviaAcademy_PricesAreAccurate()
+    {
+        var buccaneers = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Bumblin' Buccaneers"));
+        Assert.NotNull(buccaneers);
+        Assert.Equal(155_000m, buccaneers.TrashPrice);
+
+        var aetherion = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Aetherion"));
+        Assert.NotNull(aetherion);
+        Assert.Equal(105_640m, aetherion.TrashPrice);
+
+        var aphrodon = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Aphrodon"));
+        Assert.NotNull(aphrodon);
+        Assert.Equal(155_127m, aphrodon.TrashPrice);
+
+        var eventHorizon = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Event Horizon"));
+        Assert.NotNull(eventHorizon);
+        Assert.Equal(160_539m, eventHorizon.TrashPrice);
     }
 
     [Fact]

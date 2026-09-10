@@ -836,6 +836,33 @@ public partial class MainWindow : Window
     #region Keyboard Navigation
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        // If user is currently typing inside any TextBox, let the TextBox handle all input
+        if (Keyboard.FocusedElement is TextBox || e.OriginalSource is TextBox)
+        {
+            if (e.Key == Key.Escape)
+            {
+                if (SettingsOverlay.Visibility == Visibility.Visible)
+                {
+                    SettingsOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    return;
+                }
+                if (GrindOverlay.Visibility == Visibility.Visible)
+                {
+                    GrindOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    return;
+                }
+                if (HammerOverlay.Visibility == Visibility.Visible)
+                {
+                    HammerOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
+                    return;
+                }
+            }
+            return; // Allow typing 'c', 'b', 'k', 'm', 't', digits, backspace without triggering hotkeys
+        }
+
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
         {
             Copy_Click(sender, e);
