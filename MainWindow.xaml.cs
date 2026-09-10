@@ -4,12 +4,23 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace BdoCronCalculator;
 
 public partial class MainWindow : Window
 {
+    private const int WM_NCHITTEST = 0x0084;
+    private const int HTLEFT = 10;
+    private const int HTRIGHT = 11;
+    private const int HTTOP = 12;
+    private const int HTTOPLEFT = 13;
+    private const int HTTOPRIGHT = 14;
+    private const int HTBOTTOM = 15;
+    private const int HTBOTTOMLEFT = 16;
+    private const int HTBOTTOMRIGHT = 17;
+
     private readonly CalculatorEngine _engine = new();
     private bool _isInitialized = false;
     private UpdateInfo? _pendingUpdate = null;
@@ -17,10 +28,69 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        if (_engine.TaxSettings.WindowWidth >= MinWidth)
+            Width = _engine.TaxSettings.WindowWidth;
+        if (_engine.TaxSettings.WindowHeight >= MinHeight)
+            Height = _engine.TaxSettings.WindowHeight;
+
+        SizeChanged += MainWindow_SizeChanged;
+
         _isInitialized = true;
         LoadSettingsIntoUI();
         UpdateUI();
         _ = CheckForAppUpdatesAsync();
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        var helper = new WindowInteropHelper(this);
+        var source = HwndSource.FromHwnd(helper.Handle);
+        source?.AddHook(WndProc);
+    }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_NCHITTEST)
+        {
+            int x = lParam.ToInt32() & 0xffff;
+            int y = (lParam.ToInt32() >> 16) & 0xffff;
+
+            if (x > 32767) x -= 65536;
+            if (y > 32767) y -= 65536;
+
+            var screenPoint = new Point(x, y);
+            var clientPoint = PointFromScreen(screenPoint);
+
+            const int resizeBorder = 8;
+
+            bool left = clientPoint.X <= resizeBorder;
+            bool right = clientPoint.X >= ActualWidth - resizeBorder;
+            bool top = clientPoint.Y <= resizeBorder;
+            bool bottom = clientPoint.Y >= ActualHeight - resizeBorder;
+
+            if (top && left) { handled = true; return (IntPtr)HTTOPLEFT; }
+            if (top && right) { handled = true; return (IntPtr)HTTOPRIGHT; }
+            if (bottom && left) { handled = true; return (IntPtr)HTBOTTOMLEFT; }
+            if (bottom && right) { handled = true; return (IntPtr)HTBOTTOMRIGHT; }
+            if (left) { handled = true; return (IntPtr)HTLEFT; }
+            if (right) { handled = true; return (IntPtr)HTRIGHT; }
+            if (top) { handled = true; return (IntPtr)HTTOP; }
+            if (bottom) { handled = true; return (IntPtr)HTBOTTOM; }
+        }
+
+        return IntPtr.Zero;
+    }
+
+    private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (_isInitialized && WindowState == WindowState.Normal)
+        {
+            _engine.TaxSettings.WindowWidth = ActualWidth;
+            _engine.TaxSettings.WindowHeight = ActualHeight;
+            _engine.TaxSettings.Save();
+        }
     }
 
     private async Task CheckForAppUpdatesAsync()
@@ -100,12 +170,47 @@ public partial class MainWindow : Window
         if (ValuePackCheckBox != null) ValuePackCheckBox.IsChecked = s.HasValuePack;
         if (MerchantRingCheckBox != null) MerchantRingCheckBox.IsChecked = s.HasMerchantRing;
         if (FamilyFameTextBox != null) FamilyFameTextBox.Text = s.FamilyFame.ToString();
-        
+
+        if (OpacitySlider != null)
+        {
+            OpacitySlider.Value = s.BackgroundOpacity;
+            if (OpacityValueLabel != null)
+                OpacityValueLabel.Text = $"{(int)s.BackgroundOpacity}%";
+        }
+
+        ApplyBackgroundOpacity(s.BackgroundOpacity);
+
         var curVer = UpdateService.GetCurrentVersion();
         if (AppVersionLabel != null)
             AppVersionLabel.Text = $" (v{curVer.Major}.{curVer.Minor}.{curVer.Build})";
 
         UpdateSettingsRatesDisplay();
+    }
+
+    public void ApplyBackgroundOpacity(double opacityPercent)
+    {
+        double factor = Math.Clamp(opacityPercent / 100.0, 0.0, 1.0);
+        byte darkAlpha = (byte)(factor * 255);
+        byte panelAlpha = (byte)(Math.Clamp(factor * 1.05, 0.0, 1.0) * 255);
+        byte displayAlpha = (byte)(Math.Clamp(factor * 0.95, 0.0, 1.0) * 255);
+
+        if (MainOuterBorder != null)
+            MainOuterBorder.Background = new SolidColorBrush(Color.FromArgb(darkAlpha, 0x13, 0x15, 0x18));
+
+        if (TitleBarBorder != null)
+            TitleBarBorder.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0x1c, 0x1f, 0x24));
+
+        if (DisplayBorder != null)
+            DisplayBorder.Background = new SolidColorBrush(Color.FromArgb(displayAlpha, 0x10, 0x12, 0x15));
+
+        if (ActionBarBorder != null)
+            ActionBarBorder.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0x1c, 0x1f, 0x24));
+
+        if (FooterBorder != null)
+            FooterBorder.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0x1c, 0x1f, 0x24));
+
+        if (SettingsOverlay != null)
+            SettingsOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
     }
 
     private void UpdateSettingsRatesDisplay()
@@ -182,6 +287,18 @@ public partial class MainWindow : Window
     {
         if (SettingsOverlay != null)
             SettingsOverlay.Visibility = Visibility.Collapsed;
+        _engine.TaxSettings.Save();
+    }
+
+    private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_isInitialized) return;
+
+        if (OpacityValueLabel != null)
+            OpacityValueLabel.Text = $"{(int)e.NewValue}%";
+
+        _engine.TaxSettings.BackgroundOpacity = e.NewValue;
+        ApplyBackgroundOpacity(e.NewValue);
         _engine.TaxSettings.Save();
     }
 

@@ -10,6 +10,9 @@ public class MarketTaxSettings
     public bool HasValuePack { get; set; } = true;
     public bool HasMerchantRing { get; set; } = false;
     public int FamilyFame { get; set; } = 7000;
+    public double BackgroundOpacity { get; set; } = 95.0; // 0 to 100 percent
+    public double WindowWidth { get; set; } = 340.0;
+    public double WindowHeight { get; set; } = 560.0;
 
     public decimal GetFameBonusRate()
     {
