@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -51,27 +52,7 @@ public partial class MainWindow : Window
 
     private void InitializeToolViews()
     {
-        // 1. Populate Grind Spot ComboBox
-        if (GrindSpotComboBox != null)
-        {
-            GrindSpotComboBox.ItemsSource = GrindSpotDatabase.AllSpots;
-            if (GrindSpotCountLabel != null)
-                GrindSpotCountLabel.Text = $"({GrindSpotDatabase.AllSpots.Count} spots)";
-            if (GrindSpotDatabase.AllSpots.Count > 0)
-            {
-                GrindSpotComboBox.SelectedIndex = 0;
-            }
-        }
-
-        // 2. Populate Hammer Targets ComboBox
-        if (HammerTargetComboBox != null)
-        {
-            HammerTargetComboBox.ItemsSource = HammerComparisonEngine.Targets;
-            if (HammerComparisonEngine.Targets.Count > 0)
-            {
-                HammerTargetComboBox.SelectedIndex = 0;
-            }
-        }
+        // Reserved for future tool initialization
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -252,11 +233,7 @@ public partial class MainWindow : Window
         if (HudView != null)
             HudView.Background = new SolidColorBrush(Color.FromArgb(displayAlpha, 0x10, 0x12, 0x15));
 
-        if (GrindOverlay != null)
-            GrindOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
 
-        if (HammerOverlay != null)
-            HammerOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
 
         if (SettingsOverlay != null)
             SettingsOverlay.Background = new SolidColorBrush(Color.FromArgb(Math.Max((byte)230, darkAlpha), 0x13, 0x15, 0x18));
@@ -370,8 +347,7 @@ public partial class MainWindow : Window
 
             StandardView.Visibility = Visibility.Collapsed;
             SettingsOverlay.Visibility = Visibility.Collapsed;
-            GrindOverlay.Visibility = Visibility.Collapsed;
-            HammerOverlay.Visibility = Visibility.Collapsed;
+            BracketsOverlay.Visibility = Visibility.Collapsed;
             HudView.Visibility = Visibility.Visible;
 
             MinHeight = 54;
@@ -455,222 +431,330 @@ public partial class MainWindow : Window
     }
     #endregion
 
-    #region Grind Spot Trash Calculator
-    private void GrindToolButton_Click(object sender, RoutedEventArgs e)
+    #region Brackets Tool
+    // ── Data models ─────────────────────────────────────────────────────────
+    private class MasteryBracketRow
     {
-        if (GrindOverlay == null) return;
-        SettingsOverlay.Visibility = Visibility.Collapsed;
-        HammerOverlay.Visibility = Visibility.Collapsed;
-        GrindOverlay.Visibility = GrindOverlay.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-        if (GrindOverlay.Visibility == Visibility.Visible)
+        public string MasteryLabel { get; set; } = "";
+        public string BracketSummary { get; set; } = "";
+        public System.Windows.Media.Brush RowForeground { get; set; } = System.Windows.Media.Brushes.Gray;
+    }
+
+    private class ApBracketRow
+    {
+        public string RangeLabel { get; set; } = "";
+        public string BonusApText { get; set; } = "";
+        public string TotalApText { get; set; } = "";
+        public System.Windows.Media.Brush RowForeground { get; set; } = System.Windows.Media.Brushes.Gray;
+        public System.Windows.Media.Brush RowBackground { get; set; } = System.Windows.Media.Brushes.Transparent;
+    }
+
+    // ── State ────────────────────────────────────────────────────────────────
+    private System.Text.Json.JsonDocument? _masteryJson;
+    private System.Text.Json.JsonDocument? _apJson;
+
+    // ── JSON loading ─────────────────────────────────────────────────────────
+    private void EnsureBracketsLoaded()
+    {
+        var asm = System.Reflection.Assembly.GetExecutingAssembly();
+
+        if (_masteryJson == null)
         {
-            RecalculateGrindLoot();
-        }
-    }
-
-    private void CloseGrindOverlay_Click(object sender, RoutedEventArgs e)
-    {
-        if (GrindOverlay != null) GrindOverlay.Visibility = Visibility.Collapsed;
-    }
-
-    private void GrindSpotSearchBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (!_isInitialized || GrindSpotComboBox == null) return;
-
-        string filter = GrindSpotSearchBox.Text?.Trim().ToLowerInvariant() ?? "";
-        if (string.IsNullOrEmpty(filter))
-        {
-            GrindSpotComboBox.ItemsSource = GrindSpotDatabase.AllSpots;
-            if (GrindSpotCountLabel != null)
-                GrindSpotCountLabel.Text = $"({GrindSpotDatabase.AllSpots.Count} spots)";
-        }
-        else
-        {
-            var filtered = GrindSpotDatabase.AllSpots
-                .Where(s => s.Name.ToLowerInvariant().Contains(filter) ||
-                            s.Region.ToLowerInvariant().Contains(filter))
-                .ToList();
-            GrindSpotComboBox.ItemsSource = filtered;
-            if (GrindSpotCountLabel != null)
-                GrindSpotCountLabel.Text = $"({filtered.Count} found)";
-        }
-
-        if (GrindSpotComboBox.Items.Count > 0)
-        {
-            GrindSpotComboBox.SelectedIndex = 0;
-        }
-    }
-
-    private void GrindSpotComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (GrindSpotComboBox.SelectedItem is GrindSpot spot)
-        {
-            if (GrindSpotInfoLabel != null)
-                GrindSpotInfoLabel.Text = $"Recommended: {spot.RecommendedApDp}";
-            if (GrindRegionLabel != null)
-                GrindRegionLabel.Text = $"Region: {spot.Region}";
-            if (TrashPriceTextBox != null)
-                TrashPriceTextBox.Text = spot.TrashPrice.ToString(CultureInfo.InvariantCulture);
-
-            RecalculateGrindLoot();
-        }
-    }
-
-    private void TrashInputs_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (!_isInitialized) return;
-        RecalculateGrindLoot();
-    }
-
-    private void AddTrash_5k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(5_000);
-    private void AddTrash_10k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(10_000);
-    private void AddTrash_20k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(20_000);
-    private void AddTrash_50k_Click(object sender, RoutedEventArgs e) => AddTrashAmount(50_000);
-
-    private void ClearTrash_Click(object sender, RoutedEventArgs e)
-    {
-        if (TrashCountTextBox != null) TrashCountTextBox.Text = "0";
-        if (ExtraSilverTextBox != null) ExtraSilverTextBox.Text = "0";
-        RecalculateGrindLoot();
-    }
-
-    private void AddTrashAmount(decimal amount)
-    {
-        if (TrashCountTextBox == null) return;
-        if (decimal.TryParse(TrashCountTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal cur))
-        {
-            TrashCountTextBox.Text = (cur + amount).ToString(CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            TrashCountTextBox.Text = amount.ToString(CultureInfo.InvariantCulture);
-        }
-        RecalculateGrindLoot();
-    }
-
-    private void RecalculateGrindLoot()
-    {
-        if (TrashCountTextBox == null || TrashPriceTextBox == null || GrindTotalSilverText == null) return;
-
-        decimal.TryParse(TrashCountTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal trashCount);
-        decimal.TryParse(TrashPriceTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal unitPrice);
-        decimal.TryParse(ExtraSilverTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal extraSilver);
-
-        decimal trashSilver = GrindSpotDatabase.CalculateTrashSilver(trashCount, unitPrice);
-        decimal totalSilver = trashSilver + Math.Max(0m, extraSilver);
-
-        GrindTotalSilverText.Text = $"{totalSilver:N0} Silver";
-        if (GrindFormattedSummaryText != null)
-        {
-            string detail = extraSilver > 0 ? $" (Trash: {trashSilver:N0} + Extra: {extraSilver:N0})" : "";
-            GrindFormattedSummaryText.Text = $"{CalculatorEngine.FormatSilverSummary(totalSilver)}{detail}";
-        }
-    }
-
-    private void SendGrindToCalc_Click(object sender, RoutedEventArgs e)
-    {
-        decimal.TryParse(TrashCountTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal trashCount);
-        decimal.TryParse(TrashPriceTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal unitPrice);
-        decimal.TryParse(ExtraSilverTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal extraSilver);
-
-        decimal totalSilver = GrindSpotDatabase.CalculateTrashSilver(trashCount, unitPrice) + Math.Max(0m, extraSilver);
-
-        string spotName = (GrindSpotComboBox?.SelectedItem as GrindSpot)?.Name ?? "Grind Loot";
-        _engine.SetCurrentValue(totalSilver, $"{spotName} ({trashCount:N0} Trash) =");
-
-        if (GrindOverlay != null) GrindOverlay.Visibility = Visibility.Collapsed;
-        UpdateUI();
-    }
-    #endregion
-
-    #region Hammer vs. Cron Tool
-    private void HammerToolButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (HammerOverlay == null) return;
-        SettingsOverlay.Visibility = Visibility.Collapsed;
-        GrindOverlay.Visibility = Visibility.Collapsed;
-        HammerOverlay.Visibility = HammerOverlay.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-        if (HammerOverlay.Visibility == Visibility.Visible)
-        {
-            RecalculateHammerComparison();
-        }
-    }
-
-    private void CloseHammerOverlay_Click(object sender, RoutedEventArgs e)
-    {
-        if (HammerOverlay != null) HammerOverlay.Visibility = Visibility.Collapsed;
-    }
-
-    private void HammerTargetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (HammerTargetComboBox.SelectedItem is HammerTarget target)
-        {
-            if (HammerTargetInfoLabel != null)
-                HammerTargetInfoLabel.Text = $"{target.Category} • {target.Description}";
-
-            RecalculateHammerComparison();
-        }
-    }
-
-    private void HammerPrice_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (!_isInitialized) return;
-        RecalculateHammerComparison();
-    }
-
-    private void RecalculateHammerComparison()
-    {
-        if (HammerTargetComboBox == null || HammerPriceTextBox == null) return;
-
-        if (HammerTargetComboBox.SelectedItem is not HammerTarget target) return;
-
-        decimal.TryParse(HammerPriceTextBox.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal hammerPrice);
-
-        var result = HammerComparisonEngine.Compare(target, hammerPrice);
-
-        if (HammerVendorCostLabel != null)
-            HammerVendorCostLabel.Text = $"{result.VendorCronCost / 1_000_000_000m:F2} B";
-
-        if (HammerOutfitCostLabel != null)
-            HammerOutfitCostLabel.Text = $"{result.OutfitCronCost / 1_000_000_000m:F2} B";
-
-        if (HammerMarketCostLabel != null)
-            HammerMarketCostLabel.Text = $"{hammerPrice / 1_000_000_000m:F2} B";
-
-        if (HammerRecommendationText != null)
-            HammerRecommendationText.Text = result.Recommendation;
-
-        if (HammerRecommendationBorder != null)
-        {
-            if (hammerPrice < result.OutfitCronCost)
-                HammerRecommendationBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0x4c, 0xaf, 0x50)); // Green
-            else if (hammerPrice < result.VendorCronCost)
-                HammerRecommendationBorder.BorderBrush = (Brush)FindResource("AccentGold"); // Yellow/Gold
+            string masteryPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Brackets", "mastery_brackets.json");
+            if (System.IO.File.Exists(masteryPath))
+            {
+                _masteryJson = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(masteryPath));
+            }
             else
-                HammerRecommendationBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0xff, 0x52, 0x52)); // Red
+            {
+                using var stream = asm.GetManifestResourceStream("BdoCronCalculator.Brackets.mastery_brackets.json");
+                if (stream != null)
+                    _masteryJson = System.Text.Json.JsonDocument.Parse(stream);
+            }
+        }
+        if (_apJson == null)
+        {
+            string apPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Brackets", "ap_brackets.json");
+            if (System.IO.File.Exists(apPath))
+            {
+                _apJson = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(apPath));
+            }
+            else
+            {
+                using var stream = asm.GetManifestResourceStream("BdoCronCalculator.Brackets.ap_brackets.json");
+                if (stream != null)
+                    _apJson = System.Text.Json.JsonDocument.Parse(stream);
+            }
         }
     }
 
-    private void SendHammerToCalc_Click(object sender, RoutedEventArgs e)
+    // ── Overlay open/close ────────────────────────────────────────────────────
+    private void BracketsToolButton_Click(object sender, RoutedEventArgs e)
     {
-        if (HammerTargetComboBox?.SelectedItem is not HammerTarget target) return;
+        if (BracketsOverlay == null) return;
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+        BracketsOverlay.Visibility = BracketsOverlay.Visibility == Visibility.Visible
+            ? Visibility.Collapsed
+            : Visibility.Visible;
 
-        decimal.TryParse(HammerPriceTextBox?.Text.Replace(",", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal hammerPrice);
-        var result = HammerComparisonEngine.Compare(target, hammerPrice);
+        if (BracketsOverlay.Visibility == Visibility.Visible)
+        {
+            EnsureBracketsLoaded();
+            InitBracketsIfNeeded();
+        }
+    }
 
-        // Pipe the Vendor Cron cost or Hammer price into the main calculator
-        _engine.SetCurrentValue(result.VendorCronCost, $"{target.Name} (Vendor Crons) =");
+    private void CloseBracketsOverlay_Click(object sender, RoutedEventArgs e)
+    {
+        if (BracketsOverlay != null) BracketsOverlay.Visibility = Visibility.Collapsed;
+    }
 
-        if (HammerOverlay != null) HammerOverlay.Visibility = Visibility.Collapsed;
-        UpdateUI();
+    // ── One-time initialization ───────────────────────────────────────────────
+    private bool _bracketsInitialized = false;
+    private void InitBracketsIfNeeded()
+    {
+        if (_bracketsInitialized) return;
+        _bracketsInitialized = true;
+
+        // Populate lifeskill dropdown
+        var skills = new[] { "Gathering", "Fishing", "Cooking", "Alchemy", "Processing", "Hunting", "Sailing", "Horse Training" };
+        LifeskillComboBox.ItemsSource = skills;
+        LifeskillComboBox.SelectedIndex = 0;
+
+        // Render AP table (static)
+        RefreshApTable(apValue: null);
+    }
+
+    // ── Mode toggle ───────────────────────────────────────────────────────────
+    private void MasteryModeButton_Click(object sender, RoutedEventArgs e)
+    {
+        MasteryScrollView.Visibility = Visibility.Visible;
+        ApScrollView.Visibility = Visibility.Collapsed;
+        MasteryModeButton.Style = (Style)FindResource("EqualsButtonStyle");
+        ApModeButton.Style = (Style)FindResource("CalcButtonStyle");
+    }
+
+    private void ApModeButton_Click(object sender, RoutedEventArgs e)
+    {
+        MasteryScrollView.Visibility = Visibility.Collapsed;
+        ApScrollView.Visibility = Visibility.Visible;
+        MasteryModeButton.Style = (Style)FindResource("CalcButtonStyle");
+        ApModeButton.Style = (Style)FindResource("EqualsButtonStyle");
+        RefreshApTable(apValue: ParseIntBox(ApInputTextBox));
+    }
+
+    // ── Mastery logic ─────────────────────────────────────────────────────────
+    private void LifeskillComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        RefreshMasteryTable();
+    }
+
+    private void MasteryScoreTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isInitialized) return;
+        RefreshMasteryTable();
+    }
+
+    private void RefreshMasteryTable()
+    {
+        if (_masteryJson == null || LifeskillComboBox.SelectedItem == null) return;
+
+        string skill = LifeskillComboBox.SelectedItem.ToString()!.ToLower().Replace(" ", "_");
+        int? playerMastery = ParseIntBox(MasteryScoreTextBox);
+
+        if (!_masteryJson.RootElement.TryGetProperty(skill, out var arr)) return;
+
+        var rows = new System.Collections.Generic.List<MasteryBracketRow>();
+        int activeTier = -1;
+        int nextTierMastery = -1;
+
+        var entries = arr.EnumerateArray().ToList();
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            int mastery = entry.GetProperty("mastery").GetInt32();
+            bool isActive = playerMastery.HasValue && playerMastery.Value >= mastery
+                            && (i == entries.Count - 1 || playerMastery.Value < entries[i + 1].GetProperty("mastery").GetInt32());
+
+            if (isActive)
+            {
+                activeTier = mastery;
+                if (i + 1 < entries.Count)
+                    nextTierMastery = entries[i + 1].GetProperty("mastery").GetInt32();
+            }
+
+            string summary = BuildMasterySummary(entry, skill);
+            rows.Add(new MasteryBracketRow
+            {
+                MasteryLabel = $"{mastery}",
+                BracketSummary = summary,
+                RowForeground = isActive
+                    ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x00, 0xe5, 0x76))
+                    : (System.Windows.Media.Brush)new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xa0, 0xa8, 0xb4))
+            });
+        }
+
+        MasteryBracketList.ItemsSource = rows;
+
+        if (playerMastery.HasValue && activeTier >= 0)
+        {
+            int delta = nextTierMastery > 0 ? nextTierMastery - playerMastery.Value : 0;
+            MasteryActiveBracketLabel.Text = nextTierMastery > 0
+                ? $"Active: {activeTier} mastery  |  Next tier: +{delta} needed"
+                : $"Active: {activeTier} mastery  |  Max tier reached!";
+        }
+        else
+        {
+            MasteryActiveBracketLabel.Text = "Active bracket: —";
+        }
+    }
+
+    private static string BuildMasterySummary(System.Text.Json.JsonElement entry, string skill)
+    {
+        if (skill == "gathering")
+        {
+            string cChance = entry.GetProperty("common").GetProperty("chance").GetString() ?? "";
+            string cDrop = entry.GetProperty("common").GetProperty("drop_amount_increase").GetString() ?? "";
+            string sChance = entry.GetProperty("special").GetProperty("chance").GetString() ?? "";
+            string sDrop = entry.GetProperty("special").GetProperty("drop_amount_increase").GetString() ?? "";
+            string rChance = entry.GetProperty("rare").GetProperty("chance").GetString() ?? "";
+            string rDrop = entry.GetProperty("rare").GetProperty("drop_amount_increase").GetString() ?? "";
+            return $"Common: {cChance} / +{cDrop}  |  Special: {sChance} / +{sDrop}  |  Rare: {rChance} / +{rDrop}";
+        }
+        else
+        {
+            // Standard lifeskills: chance + exp_bonus or similar flat fields
+            var fields = new System.Text.StringBuilder();
+            foreach (var prop in entry.EnumerateObject())
+            {
+                if (prop.Name == "mastery") continue;
+                if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.String)
+                    fields.Append($"{prop.Name}: {prop.Value.GetString()}  ");
+            }
+            return fields.ToString().Trim();
+        }
+    }
+
+    // ── AP logic ──────────────────────────────────────────────────────────────
+    private void ApInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isInitialized) return;
+        int? ap = ParseIntBox(ApInputTextBox);
+        int? goalAp = ParseIntBox(ApGoalTextBox);
+        RefreshApTable(ap);
+        RefreshApSummary(ap, goalAp);
+    }
+
+    private void RefreshApTable(int? apValue)
+    {
+        if (_apJson == null) return;
+
+        var rows = new System.Collections.Generic.List<ApBracketRow>();
+        var activeColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x00, 0xe5, 0x76));
+        var dimColor = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xa0, 0xa8, 0xb4));
+        var activeBg = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 0x00, 0xe5, 0x76));
+
+        foreach (var entry in _apJson.RootElement.EnumerateArray())
+        {
+            int minAp = entry.GetProperty("min_ap").GetInt32();
+            int maxAp = entry.GetProperty("max_ap").GetInt32();
+            int bonusAp = entry.GetProperty("bonus_ap").GetInt32();
+            int totalAp = entry.GetProperty("total_attack_ap").GetInt32();
+
+            bool isActive = apValue.HasValue && apValue.Value >= minAp && apValue.Value <= maxAp;
+
+            rows.Add(new ApBracketRow
+            {
+                RangeLabel = maxAp >= 9999 ? $"{minAp}+" : $"{minAp}–{maxAp}",
+                BonusApText = $"+{bonusAp} AP",
+                TotalApText = $"= {totalAp} AP",
+                RowForeground = isActive ? activeColor : dimColor,
+                RowBackground = isActive ? activeBg : System.Windows.Media.Brushes.Transparent
+            });
+        }
+
+        ApBracketList.ItemsSource = rows;
+    }
+
+    private void RefreshApSummary(int? ap, int? goalAp)
+    {
+        if (!ap.HasValue || _apJson == null)
+        {
+            ApCurrentBracketText.Text = "Enter your AP above";
+            ApNextBracketText.Text = "—";
+            ApGoalDeltaText.Text = "";
+            return;
+        }
+
+        System.Text.Json.JsonElement? current = null;
+        System.Text.Json.JsonElement? next = null;
+        var allEntries = _apJson.RootElement.EnumerateArray().ToList();
+
+        for (int i = 0; i < allEntries.Count; i++)
+        {
+            int min = allEntries[i].GetProperty("min_ap").GetInt32();
+            int max = allEntries[i].GetProperty("max_ap").GetInt32();
+            if (ap.Value >= min && ap.Value <= max)
+            {
+                current = allEntries[i];
+                if (i + 1 < allEntries.Count) next = allEntries[i + 1];
+                break;
+            }
+        }
+
+        if (current == null)
+        {
+            ApCurrentBracketText.Text = "No bracket found";
+            ApNextBracketText.Text = "—";
+            ApGoalDeltaText.Text = "";
+            return;
+        }
+
+        int bonusAp = current.Value.GetProperty("bonus_ap").GetInt32();
+        int totalAttack = current.Value.GetProperty("total_attack_ap").GetInt32();
+        ApCurrentBracketText.Text = $"+{bonusAp} Bonus AP  (Total: {totalAttack} AP)";
+
+        if (next.HasValue)
+        {
+            int nextMin = next.Value.GetProperty("min_ap").GetInt32();
+            int nextBonus = next.Value.GetProperty("bonus_ap").GetInt32();
+            ApNextBracketText.Text = $"Next tier: {nextMin} AP → +{nextBonus} Bonus AP  ({nextMin - ap.Value} AP needed)";
+        }
+        else
+        {
+            ApNextBracketText.Text = "Max AP bracket reached!";
+        }
+
+        if (goalAp.HasValue)
+        {
+            int delta = goalAp.Value - ap.Value;
+            ApGoalDeltaText.Text = delta > 0
+                ? $"🎯 Goal: {goalAp.Value} AP  →  need +{delta} AP"
+                : $"🎯 Goal {goalAp.Value} AP already reached!";
+        }
+        else
+        {
+            ApGoalDeltaText.Text = "";
+        }
+    }
+
+    // ── Utility ───────────────────────────────────────────────────────────────
+    private static int? ParseIntBox(TextBox box)
+    {
+        if (box == null) return null;
+        string text = box.Text?.Trim() ?? "";
+        if (int.TryParse(text, out int val) && val >= 0) return val;
+        return null;
     }
     #endregion
+
+
+
 
     #region Settings Overlay & Sliders
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        GrindOverlay.Visibility = Visibility.Collapsed;
-        HammerOverlay.Visibility = Visibility.Collapsed;
+        BracketsOverlay.Visibility = Visibility.Collapsed;
         SettingsOverlay.Visibility = SettingsOverlay.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
     }
 
@@ -847,18 +931,6 @@ public partial class MainWindow : Window
                     e.Handled = true;
                     return;
                 }
-                if (GrindOverlay.Visibility == Visibility.Visible)
-                {
-                    GrindOverlay.Visibility = Visibility.Collapsed;
-                    e.Handled = true;
-                    return;
-                }
-                if (HammerOverlay.Visibility == Visibility.Visible)
-                {
-                    HammerOverlay.Visibility = Visibility.Collapsed;
-                    e.Handled = true;
-                    return;
-                }
             }
             return; // Allow typing 'c', 'b', 'k', 'm', 't', digits, backspace without triggering hotkeys
         }
@@ -940,18 +1012,6 @@ public partial class MainWindow : Window
                 if (SettingsOverlay.Visibility == Visibility.Visible)
                 {
                     SettingsOverlay.Visibility = Visibility.Collapsed;
-                    e.Handled = true;
-                    return;
-                }
-                if (GrindOverlay.Visibility == Visibility.Visible)
-                {
-                    GrindOverlay.Visibility = Visibility.Collapsed;
-                    e.Handled = true;
-                    return;
-                }
-                if (HammerOverlay.Visibility == Visibility.Visible)
-                {
-                    HammerOverlay.Visibility = Visibility.Collapsed;
                     e.Handled = true;
                     return;
                 }

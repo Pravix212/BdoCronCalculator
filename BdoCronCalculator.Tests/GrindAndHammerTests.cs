@@ -10,7 +10,7 @@ public sealed class GrindAndHammerTests
     public void GrindSpotDatabase_HasValidSpots_NoNegativeOrZeroPrices()
     {
         Assert.NotEmpty(GrindSpotDatabase.AllSpots);
-        Assert.True(GrindSpotDatabase.AllSpots.Count >= 50, $"Database has {GrindSpotDatabase.AllSpots.Count} spots, expected >= 50");
+        Assert.True(GrindSpotDatabase.AllSpots.Count >= 20, $"Database has {GrindSpotDatabase.AllSpots.Count} spots, expected >= 20");
 
         foreach (var spot in GrindSpotDatabase.AllSpots)
         {
@@ -21,13 +21,12 @@ public sealed class GrindAndHammerTests
     }
 
     [Theory]
-    [InlineData("hexe", 2)] // Elvia Hexe Sanctuary, Hexe Sanctuary (Standard)
-    [InlineData("dehkia", 12)] // All Dehkia spots
-    [InlineData("orcs", 1)] // Elvia Orc Camp
-    [InlineData("morning light", 8)] // Land of the morning light spots
+    [InlineData("tunkuta", 2)] // Tunkuta, Tunkuta [Dehkia's Lantern]
+    [InlineData("dehkia", 4)] // Ash Forest [Dehkia 2], [Dehkia] Gyfin Rhasia, [Dehkia] Mirumok, Tunkuta [Dehkia's Lantern]
+    [InlineData("star's end", 1)] // Star's End
+    [InlineData("sycraia", 1)] // Sycraia Ruins Lower Zone (Abyssal)
     [InlineData("buccaneers", 1)] // Olvia Academy Bumblin' Buccaneers
-    [InlineData("bumblin", 1)] // Olvia Academy Bumblin' Buccaneers
-    [InlineData("edania", 7)] // All 7 Edania spots (Event Horizon, Aresion, Scales, Magaia, Hermesia, Aphrodon, Aetherion)
+    [InlineData("edania", 16)] // All 16 Edania spots
     public void GrindSpotDatabase_SearchFiltering_ReturnsExpectedMatches(string query, int minimumMatches)
     {
         var filtered = GrindSpotDatabase.AllSpots
@@ -38,7 +37,7 @@ public sealed class GrindAndHammerTests
     }
 
     [Fact]
-    public void GrindSpotDatabase_EdaniaAndOlviaAcademy_PricesAreAccurate()
+    public void GrindSpotDatabase_VerifiedSpots_PricesAreAccurate()
     {
         var buccaneers = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Bumblin' Buccaneers"));
         Assert.NotNull(buccaneers);
@@ -55,6 +54,42 @@ public sealed class GrindAndHammerTests
         var eventHorizon = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Event Horizon"));
         Assert.NotNull(eventHorizon);
         Assert.Equal(196_501m, eventHorizon.TrashPrice);
+
+        var scales = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Scales of Judgment"));
+        Assert.NotNull(scales);
+        Assert.Equal(186_458m, scales.TrashPrice);
+
+        var aresion = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Aresion"));
+        Assert.NotNull(aresion);
+        Assert.Equal(182_049m, aresion.TrashPrice);
+
+        var magaia = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Magaia"));
+        Assert.NotNull(magaia);
+        Assert.Equal(181_042m, magaia.TrashPrice);
+
+        var gavinya = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Gavinya Coastal Cliff"));
+        Assert.NotNull(gavinya);
+        Assert.Equal(165_508m, gavinya.TrashPrice);
+
+        var starsEnd = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Star's End"));
+        Assert.NotNull(starsEnd);
+        Assert.Equal(155_000m, starsEnd.TrashPrice);
+
+        var sycraia = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Sycraia Ruins Lower Zone"));
+        Assert.NotNull(sycraia);
+        Assert.Equal(107_900m, sycraia.TrashPrice);
+
+        var dehkiaAsh2 = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Ash Forest [Dehkia 2]"));
+        Assert.NotNull(dehkiaAsh2);
+        Assert.Equal(52_500m, dehkiaAsh2.TrashPrice);
+
+        var dehkiaTunkuta = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name.Contains("Tunkuta [Dehkia's Lantern]"));
+        Assert.NotNull(dehkiaTunkuta);
+        Assert.Equal(40_000m, dehkiaTunkuta.TrashPrice);
+
+        var tunkuta = GrindSpotDatabase.AllSpots.FirstOrDefault(s => s.Name == "Tunkuta (Turos)");
+        Assert.NotNull(tunkuta);
+        Assert.Equal(18_000m, tunkuta.TrashPrice);
     }
 
     [Fact]

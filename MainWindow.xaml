@@ -51,7 +51,6 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Icon -->
@@ -68,42 +67,25 @@
                         <TextBlock Text="Calculator" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FontSize="12" TextTrimming="CharacterEllipsis" />
                     </StackPanel>
 
-                    <!-- Grind Spot Tool Button -->
+                    <!-- Brackets Tool Button -->
                     <Button Grid.Column="2"
-                            x:Name="GrindToolButton"
+                            x:Name="BracketsToolButton"
                             Height="24"
                             Padding="5,0"
                             Margin="1,0"
-                            Click="GrindToolButton_Click"
-                            ToolTip="Grind Spot Trash Loot Calculator"
+                            Click="BracketsToolButton_Click"
+                            ToolTip="Mastery &amp; AP Brackets Reference"
                             Background="Transparent"
                             BorderThickness="0"
                             Cursor="Hand">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚔ " FontSize="11" Foreground="#4caf50" VerticalAlignment="Center" />
-                            <TextBlock Text="Grind" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Hammer vs Cron Tool Button -->
-                    <Button Grid.Column="3"
-                            x:Name="HammerToolButton"
-                            Height="24"
-                            Padding="5,0"
-                            Margin="1,0"
-                            Click="HammerToolButton_Click"
-                            ToolTip="Hammer vs. Cron Stone Value Tool"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🔨 " FontSize="11" Foreground="{StaticResource AccentGold}" VerticalAlignment="Center" />
-                            <TextBlock Text="Hammer" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock Text="📊 " FontSize="11" Foreground="{StaticResource AccentCron}" VerticalAlignment="Center" />
+                            <TextBlock Text="Brackets" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
 
                     <!-- HUD Mini Mode Toggle Button -->
-                    <Button Grid.Column="4"
+                    <Button Grid.Column="3"
                             x:Name="HudButton"
                             Width="26"
                             Height="24"
@@ -117,7 +99,7 @@
                     </Button>
 
                     <!-- Settings Button -->
-                    <Button Grid.Column="5"
+                    <Button Grid.Column="4"
                             x:Name="SettingsButton"
                             Width="26"
                             Height="24"
@@ -131,7 +113,7 @@
                     </Button>
 
                     <!-- Always-on-Top Pin Button -->
-                    <Button Grid.Column="6"
+                    <Button Grid.Column="5"
                             x:Name="PinButton"
                             Width="26"
                             Height="24"
@@ -145,7 +127,7 @@
                     </Button>
 
                     <!-- Minimize Button -->
-                    <Button Grid.Column="7"
+                    <Button Grid.Column="6"
                             Width="26"
                             Height="24"
                             Margin="1,0"
@@ -159,7 +141,7 @@
                             Cursor="Hand" />
 
                     <!-- Close Button -->
-                    <Button Grid.Column="8"
+                    <Button Grid.Column="7"
                             Width="26"
                             Height="24"
                             Margin="1,0"
@@ -215,7 +197,11 @@
                                 Visibility="Collapsed">
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
@@ -459,8 +445,8 @@
                 </Grid>
             </Border>
 
-            <!-- 4. Grind Spot Trash Loot Calculator Overlay View -->
-            <Border x:Name="GrindOverlay"
+            <!-- 4. Brackets Overlay View -->
+            <Border x:Name="BracketsOverlay"
                     Grid.Row="1"
                     Background="#131518"
                     Visibility="Collapsed"
@@ -471,114 +457,58 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <!-- Header -->
-                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="⚔ " FontSize="14" Foreground="#4caf50" />
-                            <TextBlock Text="Grind Spot Trash Loot Calculator" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                            <TextBlock Text="📊 " FontSize="14" Foreground="{StaticResource AccentCron}" />
+                            <TextBlock Text="Brackets Reference" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
                         </StackPanel>
                     </Grid>
 
-                    <!-- Body -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <!-- Mode Toggle Buttons -->
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                x:Name="MasteryModeButton"
+                                Height="30"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Content="📦 Mastery"
+                                Click="MasteryModeButton_Click"
+                                Style="{StaticResource EqualsButtonStyle}" />
+                        <Button Grid.Column="2"
+                                x:Name="ApModeButton"
+                                Height="30"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Content="⚔ AP"
+                                Click="ApModeButton_Click"
+                                Style="{StaticResource CalcButtonStyle}" />
+                    </Grid>
+
+                    <!-- Mastery View -->
+                    <ScrollViewer Grid.Row="2" x:Name="MasteryScrollView" VerticalScrollBarVisibility="Auto" Visibility="Visible">
                         <StackPanel>
-                            <!-- Spot Selector Card -->
+                            <!-- Lifeskill Selector -->
                             <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
                                 <StackPanel>
-                                    <Grid Margin="0,0,0,4">
-                                        <TextBlock Text="Select Grind Spot" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" VerticalAlignment="Center" />
-                                        <TextBlock x:Name="GrindSpotCountLabel" Text="(60+ spots)" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                                    </Grid>
-                                    
-                                    <!-- Live Search Box with Placeholder -->
-                                    <Grid Margin="0,2,0,6">
-                                        <TextBox x:Name="GrindSpotSearchBox"
-                                                 Height="28"
-                                                 FontSize="12"
-                                                 Background="#14171c"
-                                                 Foreground="{StaticResource TextPrimary}"
-                                                 BorderBrush="{StaticResource BorderDark}"
-                                                 Padding="6,4"
-                                                 TextChanged="GrindSpotSearchBox_TextChanged"
-                                                 ToolTip="Type spot name or region to filter (e.g. 'hexe', 'orcs', 'ulukita', 'dehkia', 'centaur')" />
-                                        <TextBlock Text="🔍 Search spots (e.g. hexe, dehkia, orcs)..."
-                                                   Foreground="{StaticResource TextSecondary}"
-                                                   FontSize="11"
-                                                   VerticalAlignment="Center"
-                                                   Margin="8,0,0,0"
-                                                   IsHitTestVisible="False">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Text, ElementName=GrindSpotSearchBox}" Value="">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Grid>
-
-                                    <ComboBox x:Name="GrindSpotComboBox"
-                                              Margin="0,0,0,4"
+                                    <TextBlock Text="Lifeskill" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" Margin="0,0,0,6" />
+                                    <ComboBox x:Name="LifeskillComboBox"
                                               Height="28"
-                                              DisplayMemberPath="DisplayName"
-                                              SelectionChanged="GrindSpotComboBox_SelectionChanged" />
-                                    <Grid Margin="0,2,0,0">
-                                        <TextBlock x:Name="GrindSpotInfoLabel" Text="Recommended: —" Foreground="{StaticResource TextSecondary}" FontSize="11" />
-                                        <TextBlock x:Name="GrindRegionLabel" Text="Region: —" Foreground="{StaticResource AccentCron}" FontSize="11" HorizontalAlignment="Right" />
-                                    </Grid>
+                                              SelectionChanged="LifeskillComboBox_SelectionChanged" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Trash Loot Quantity Card -->
-                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
-                                <StackPanel>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Trash Loot Amount" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" VerticalAlignment="Center" />
-                                        <TextBox Grid.Column="1"
-                                                 x:Name="TrashCountTextBox"
-                                                 Width="120"
-                                                 Height="28"
-                                                 Text="0"
-                                                 Background="#101215"
-                                                 Foreground="{StaticResource TextPrimary}"
-                                                 BorderBrush="{StaticResource BorderDark}"
-                                                 VerticalContentAlignment="Center"
-                                                 HorizontalContentAlignment="Right"
-                                                 FontSize="13"
-                                                 FontWeight="Bold"
-                                                 Padding="4,0"
-                                                 TextChanged="TrashInputs_TextChanged" />
-                                    </Grid>
-                                    <!-- Quick Multipliers -->
-                                    <Grid Margin="0,6,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Button Grid.Column="0" Margin="1" Style="{StaticResource CalcButtonStyle}" Height="22" FontSize="10" Content="+5k" Click="AddTrash_5k_Click" />
-                                        <Button Grid.Column="1" Margin="1" Style="{StaticResource CalcButtonStyle}" Height="22" FontSize="10" Content="+10k" Click="AddTrash_10k_Click" />
-                                        <Button Grid.Column="2" Margin="1" Style="{StaticResource CalcButtonStyle}" Height="22" FontSize="10" Content="+20k" Click="AddTrash_20k_Click" />
-                                        <Button Grid.Column="3" Margin="1" Style="{StaticResource CalcButtonStyle}" Height="22" FontSize="10" Content="+50k" Click="AddTrash_50k_Click" />
-                                        <Button Grid.Column="4" Margin="1" Style="{StaticResource CalcButtonStyle}" Height="22" FontSize="10" Content="Clr" Foreground="#ff6b6b" Click="ClearTrash_Click" />
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Unit Price (Customizable) -->
+                            <!-- Mastery Input -->
                             <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -586,14 +516,14 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Trash Unit Price (Silver)" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" />
-                                        <TextBlock Text="Auto-filled or enter custom" Foreground="{StaticResource TextSecondary}" FontSize="10" />
+                                        <TextBlock Text="Your Mastery Score" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" />
+                                        <TextBlock x:Name="MasteryActiveBracketLabel" Text="Active bracket: —" Foreground="{StaticResource AccentCron}" FontSize="10" Margin="0,2,0,0" />
                                     </StackPanel>
                                     <TextBox Grid.Column="1"
-                                             x:Name="TrashPriceTextBox"
-                                             Width="120"
+                                             x:Name="MasteryScoreTextBox"
+                                             Width="100"
                                              Height="28"
-                                             Text="0"
+                                             Text=""
                                              Background="#101215"
                                              Foreground="{StaticResource AccentCron}"
                                              BorderBrush="{StaticResource BorderDark}"
@@ -602,214 +532,154 @@
                                              FontSize="13"
                                              FontWeight="Bold"
                                              Padding="4,0"
-                                             TextChanged="TrashInputs_TextChanged" />
+                                             TextChanged="MasteryScoreTextBox_TextChanged" />
                                 </Grid>
                             </Border>
 
-                            <!-- Rare Drop / Extra Silver -->
-                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Extra / Rare Drops (Silver)" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" />
-                                        <TextBlock Text="Debo drop, Caphras, Black stones..." Foreground="{StaticResource TextSecondary}" FontSize="10" />
-                                    </StackPanel>
-                                    <TextBox Grid.Column="1"
-                                             x:Name="ExtraSilverTextBox"
-                                             Width="120"
-                                             Height="28"
-                                             Text="0"
-                                             Background="#101215"
-                                             Foreground="{StaticResource AccentGold}"
-                                             BorderBrush="{StaticResource BorderDark}"
-                                             VerticalContentAlignment="Center"
-                                             HorizontalContentAlignment="Right"
-                                             FontSize="13"
-                                             FontWeight="Bold"
-                                             Padding="4,0"
-                                             TextChanged="TrashInputs_TextChanged" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Calculated Session Silver Card -->
-                            <Border Background="#1b2028" BorderBrush="#4caf50" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,4">
+                            <!-- Mastery Brackets Table -->
+                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,4">
                                 <StackPanel>
-                                    <TextBlock Text="SESSION ESTIMATED SILVER" FontWeight="Bold" Foreground="#4caf50" FontSize="11" />
-                                    <TextBlock x:Name="GrindTotalSilverText" Text="0 Silver" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="Bold" Margin="0,4,0,0" />
-                                    <TextBlock x:Name="GrindFormattedSummaryText" Text="0 Silver" Foreground="{StaticResource AccentGold}" FontSize="12" FontWeight="SemiBold" Margin="0,2,0,0" />
+                                    <TextBlock Text="BRACKET TABLE" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,0,0,6" />
+                                    <ItemsControl x:Name="MasteryBracketList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="BracketRow"
+                                                        Background="Transparent"
+                                                        CornerRadius="4"
+                                                        Padding="6,4"
+                                                        Margin="0,1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="55" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{Binding MasteryLabel}"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{Binding RowForeground}"
+                                                                   FontSize="11" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding BracketSummary}"
+                                                                   Foreground="{Binding RowForeground}"
+                                                                   FontSize="11"
+                                                                   TextWrapping="Wrap" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
 
-                    <!-- Action Buttons -->
-                    <Grid Grid.Row="2" Margin="0,8,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.4*" />
-                            <ColumnDefinition Width="6" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0"
-                                Style="{StaticResource EqualsButtonStyle}"
-                                Height="34"
-                                Content="➡️ Send to Calculator"
-                                FontSize="12"
-                                Click="SendGrindToCalc_Click" />
-                        <Button Grid.Column="2"
-                                Style="{StaticResource CalcButtonStyle}"
-                                Height="34"
-                                Content="Close"
-                                FontSize="12"
-                                Click="CloseGrindOverlay_Click" />
-                    </Grid>
-                </Grid>
-            </Border>
-
-            <!-- 5. Hammer vs. Cron Value Comparison Overlay View -->
-            <Border x:Name="HammerOverlay"
-                    Grid.Row="1"
-                    Background="#131518"
-                    Visibility="Collapsed"
-                    CornerRadius="0,0,10,10"
-                    BorderBrush="{StaticResource BorderDark}"
-                    BorderThickness="0,1,0,0"
-                    Padding="14,12">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!-- Header -->
-                    <Grid Grid.Row="0" Margin="0,0,0,10">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="🔨 " FontSize="14" Foreground="{StaticResource AccentGold}" />
-                            <TextBlock Text="Hammer vs. Cron Comparison" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Body -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <!-- AP View -->
+                    <ScrollViewer Grid.Row="2" x:Name="ApScrollView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
                         <StackPanel>
-                            <!-- Target Selector -->
+                            <!-- AP Inputs -->
                             <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
                                 <StackPanel>
-                                    <TextBlock Text="Select Enhancement Target" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" />
-                                    <ComboBox x:Name="HammerTargetComboBox"
-                                              Margin="0,6,0,4"
-                                              Height="28"
-                                              DisplayMemberPath="DisplayName"
-                                              SelectionChanged="HammerTargetComboBox_SelectionChanged" />
-                                    <TextBlock x:Name="HammerTargetInfoLabel" Text="Item: —" Foreground="{StaticResource AccentCron}" FontSize="11" />
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Your AP" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" VerticalAlignment="Center" />
+                                        <TextBox Grid.Column="1"
+                                                 x:Name="ApInputTextBox"
+                                                 Width="100"
+                                                 Height="28"
+                                                 Text=""
+                                                 Background="#101215"
+                                                 Foreground="{StaticResource AccentCron}"
+                                                 BorderBrush="{StaticResource BorderDark}"
+                                                 VerticalContentAlignment="Center"
+                                                 HorizontalContentAlignment="Right"
+                                                 FontSize="13"
+                                                 FontWeight="Bold"
+                                                 Padding="4,0"
+                                                 TextChanged="ApInputTextBox_TextChanged" />
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Goal AP (optional)" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" VerticalAlignment="Center" />
+                                        <TextBox Grid.Column="1"
+                                                 x:Name="ApGoalTextBox"
+                                                 Width="100"
+                                                 Height="28"
+                                                 Text=""
+                                                 Background="#101215"
+                                                 Foreground="{StaticResource AccentGold}"
+                                                 BorderBrush="{StaticResource BorderDark}"
+                                                 VerticalContentAlignment="Center"
+                                                 HorizontalContentAlignment="Right"
+                                                 FontSize="13"
+                                                 FontWeight="Bold"
+                                                 Padding="4,0"
+                                                 TextChanged="ApInputTextBox_TextChanged" />
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
-                            <!-- Hammer Market Price Input -->
-                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Hammer Market Price (Silver)" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" FontSize="12" />
-                                        <TextBlock Text="Current Central Market cost" Foreground="{StaticResource TextSecondary}" FontSize="10" />
-                                    </StackPanel>
-                                    <TextBox Grid.Column="1"
-                                             x:Name="HammerPriceTextBox"
-                                             Width="120"
-                                             Height="28"
-                                             Text="27500000000"
-                                             Background="#101215"
-                                             Foreground="{StaticResource AccentGold}"
-                                             BorderBrush="{StaticResource BorderDark}"
-                                             VerticalContentAlignment="Center"
-                                             HorizontalContentAlignment="Right"
-                                             FontSize="12"
-                                             FontWeight="Bold"
-                                             Padding="4,0"
-                                             TextChanged="HammerPrice_TextChanged" />
-                                </Grid>
+                            <!-- AP Current Bracket Summary -->
+                            <Border x:Name="ApSummaryBorder" Background="#1b2028" BorderBrush="{StaticResource AccentCron}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="CURRENT BRACKET" FontWeight="Bold" Foreground="{StaticResource AccentCron}" FontSize="10" />
+                                    <TextBlock x:Name="ApCurrentBracketText" Text="Enter your AP above" Foreground="{StaticResource TextPrimary}" FontSize="13" FontWeight="Bold" Margin="0,4,0,2" />
+                                    <TextBlock x:Name="ApNextBracketText" Text="—" Foreground="{StaticResource TextSecondary}" FontSize="11" />
+                                    <TextBlock x:Name="ApGoalDeltaText" Text="" Foreground="{StaticResource AccentGold}" FontSize="11" Margin="0,2,0,0" />
+                                </StackPanel>
                             </Border>
 
-                            <!-- Comparison 3 Cards -->
-                            <Grid Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="4" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="4" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <!-- Card 1: Vendor Crons -->
-                                <Border Grid.Column="0" Background="{DynamicResource BgPanel}" BorderBrush="#00b4d8" BorderThickness="1" CornerRadius="6" Padding="6,6">
-                                    <StackPanel>
-                                        <TextBlock Text="Vendor Crons" Foreground="{StaticResource AccentCron}" FontSize="10" FontWeight="Bold" />
-                                        <TextBlock Text="@ 3.0M" Foreground="{StaticResource TextSecondary}" FontSize="9" />
-                                        <TextBlock x:Name="HammerVendorCostLabel" Text="0 B" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="Bold" Margin="0,4,0,0" />
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Card 2: Outfit Crons -->
-                                <Border Grid.Column="2" Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="6" Padding="6,6">
-                                    <StackPanel>
-                                        <TextBlock Text="Outfit Crons" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold" />
-                                        <TextBlock Text="@ 2.18M" Foreground="{StaticResource TextSecondary}" FontSize="9" />
-                                        <TextBlock x:Name="HammerOutfitCostLabel" Text="0 B" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="Bold" Margin="0,4,0,0" />
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Card 3: Hammer Price -->
-                                <Border Grid.Column="4" Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource AccentGold}" BorderThickness="1" CornerRadius="6" Padding="6,6">
-                                    <StackPanel>
-                                        <TextBlock Text="Hammer Market" Foreground="{StaticResource AccentGold}" FontSize="10" FontWeight="Bold" />
-                                        <TextBlock Text="Marketplace" Foreground="{StaticResource TextSecondary}" FontSize="9" />
-                                        <TextBlock x:Name="HammerMarketCostLabel" Text="27.5 B" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="Bold" Margin="0,4,0,0" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-
-                            <!-- Recommendation Banner -->
-                            <Border x:Name="HammerRecommendationBorder" Background="#1b2028" BorderBrush="{StaticResource AccentGold}" BorderThickness="1.5" CornerRadius="8" Padding="10,8" Margin="0,0,0,4">
+                            <!-- AP Reference Table -->
+                            <Border Background="{DynamicResource BgPanel}" BorderBrush="{StaticResource BorderDark}" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,0,0,4">
                                 <StackPanel>
-                                    <TextBlock Text="ANALYSIS &amp; RECOMMENDATION" FontWeight="Bold" Foreground="{StaticResource AccentGold}" FontSize="10" />
-                                    <TextBlock x:Name="HammerRecommendationText"
-                                               Text="Calculating..."
-                                               Foreground="{StaticResource TextPrimary}"
-                                               FontSize="12"
-                                               FontWeight="SemiBold"
-                                               TextWrapping="Wrap"
-                                               Margin="0,4,0,0" />
+                                    <TextBlock Text="AP BRACKET TABLE" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,0,0,6" />
+                                    <ItemsControl x:Name="ApBracketList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="4" Padding="6,4" Margin="0,1" Background="{Binding RowBackground}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="65" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{Binding RangeLabel}"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{Binding RowForeground}"
+                                                                   FontSize="11" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding BonusApText}"
+                                                                   Foreground="{Binding RowForeground}"
+                                                                   FontSize="11" />
+                                                        <TextBlock Grid.Column="2"
+                                                                   Text="{Binding TotalApText}"
+                                                                   Foreground="{Binding RowForeground}"
+                                                                   FontSize="11"
+                                                                   HorizontalAlignment="Right" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
 
-                    <!-- Action Buttons -->
-                    <Grid Grid.Row="2" Margin="0,8,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.4*" />
-                            <ColumnDefinition Width="6" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0"
-                                Style="{StaticResource EqualsButtonStyle}"
-                                Height="34"
-                                Content="➡️ Send Cost to Calc"
-                                FontSize="12"
-                                Click="SendHammerToCalc_Click" />
-                        <Button Grid.Column="2"
-                                Style="{StaticResource CalcButtonStyle}"
-                                Height="34"
-                                Content="Close"
-                                FontSize="12"
-                                Click="CloseHammerOverlay_Click" />
-                    </Grid>
+                    <!-- Close Button -->
+                    <Button Grid.Row="3"
+                            Style="{StaticResource CalcButtonStyle}"
+                            Height="32"
+                            Margin="0,8,0,0"
+                            Content="Close"
+                            FontSize="12"
+                            Click="CloseBracketsOverlay_Click" />
                 </Grid>
             </Border>
 

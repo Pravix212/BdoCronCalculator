@@ -1,0 +1,632 @@
+[
+  {
+    "min_ap": 100,
+    "max_ap": 139,
+    "bonus_ap": 5,
+    "bonus_diff": 5,
+    "total_attack_ap": 144
+  },
+  {
+    "min_ap": 140,
+    "max_ap": 169,
+    "bonus_ap": 10,
+    "bonus_diff": 5,
+    "total_attack_ap": 179
+  },
+  {
+    "min_ap": 170,
+    "max_ap": 183,
+    "bonus_ap": 15,
+    "bonus_diff": 5,
+    "total_attack_ap": 198
+  },
+  {
+    "min_ap": 184,
+    "max_ap": 208,
+    "bonus_ap": 20,
+    "bonus_diff": 5,
+    "total_attack_ap": 228
+  },
+  {
+    "min_ap": 209,
+    "max_ap": 234,
+    "bonus_ap": 30,
+    "bonus_diff": 10,
+    "total_attack_ap": 264
+  },
+  {
+    "min_ap": 235,
+    "max_ap": 244,
+    "bonus_ap": 40,
+    "bonus_diff": 10,
+    "total_attack_ap": 284
+  },
+  {
+    "min_ap": 245,
+    "max_ap": 248,
+    "bonus_ap": 48,
+    "bonus_diff": 8,
+    "total_attack_ap": 296
+  },
+  {
+    "min_ap": 249,
+    "max_ap": 252,
+    "bonus_ap": 57,
+    "bonus_diff": 9,
+    "total_attack_ap": 309
+  },
+  {
+    "min_ap": 253,
+    "max_ap": 256,
+    "bonus_ap": 69,
+    "bonus_diff": 12,
+    "total_attack_ap": 325
+  },
+  {
+    "min_ap": 257,
+    "max_ap": 260,
+    "bonus_ap": 83,
+    "bonus_diff": 14,
+    "total_attack_ap": 343
+  },
+  {
+    "min_ap": 261,
+    "max_ap": 264,
+    "bonus_ap": 101,
+    "bonus_diff": 18,
+    "total_attack_ap": 365
+  },
+  {
+    "min_ap": 265,
+    "max_ap": 268,
+    "bonus_ap": 122,
+    "bonus_diff": 21,
+    "total_attack_ap": 390
+  },
+  {
+    "min_ap": 269,
+    "max_ap": 272,
+    "bonus_ap": 137,
+    "bonus_diff": 15,
+    "total_attack_ap": 409
+  },
+  {
+    "min_ap": 273,
+    "max_ap": 276,
+    "bonus_ap": 142,
+    "bonus_diff": 5,
+    "total_attack_ap": 418
+  },
+  {
+    "min_ap": 277,
+    "max_ap": 280,
+    "bonus_ap": 148,
+    "bonus_diff": 6,
+    "total_attack_ap": 428
+  },
+  {
+    "min_ap": 281,
+    "max_ap": 284,
+    "bonus_ap": 154,
+    "bonus_diff": 6,
+    "total_attack_ap": 438
+  },
+  {
+    "min_ap": 285,
+    "max_ap": 288,
+    "bonus_ap": 160,
+    "bonus_diff": 6,
+    "total_attack_ap": 448
+  },
+  {
+    "min_ap": 289,
+    "max_ap": 292,
+    "bonus_ap": 167,
+    "bonus_diff": 7,
+    "total_attack_ap": 459
+  },
+  {
+    "min_ap": 293,
+    "max_ap": 296,
+    "bonus_ap": 174,
+    "bonus_diff": 7,
+    "total_attack_ap": 470
+  },
+  {
+    "min_ap": 297,
+    "max_ap": 300,
+    "bonus_ap": 181,
+    "bonus_diff": 7,
+    "total_attack_ap": 481
+  },
+  {
+    "min_ap": 301,
+    "max_ap": 304,
+    "bonus_ap": 188,
+    "bonus_diff": 7,
+    "total_attack_ap": 492
+  },
+  {
+    "min_ap": 305,
+    "max_ap": 308,
+    "bonus_ap": 196,
+    "bonus_diff": 8,
+    "total_attack_ap": 504
+  },
+  {
+    "min_ap": 309,
+    "max_ap": 315,
+    "bonus_ap": 200,
+    "bonus_diff": 4,
+    "total_attack_ap": 515
+  },
+  {
+    "min_ap": 316,
+    "max_ap": 320,
+    "bonus_ap": 203,
+    "bonus_diff": 3,
+    "total_attack_ap": 523
+  },
+  {
+    "min_ap": 321,
+    "max_ap": 327,
+    "bonus_ap": 205,
+    "bonus_diff": 2,
+    "total_attack_ap": 532
+  },
+  {
+    "min_ap": 328,
+    "max_ap": 331,
+    "bonus_ap": 208,
+    "bonus_diff": 3,
+    "total_attack_ap": 539
+  },
+  {
+    "min_ap": 332,
+    "max_ap": 336,
+    "bonus_ap": 211,
+    "bonus_diff": 3,
+    "total_attack_ap": 547
+  },
+  {
+    "min_ap": 337,
+    "max_ap": 341,
+    "bonus_ap": 214,
+    "bonus_diff": 3,
+    "total_attack_ap": 555
+  },
+  {
+    "min_ap": 342,
+    "max_ap": 346,
+    "bonus_ap": 217,
+    "bonus_diff": 3,
+    "total_attack_ap": 563
+  },
+  {
+    "min_ap": 347,
+    "max_ap": 351,
+    "bonus_ap": 220,
+    "bonus_diff": 3,
+    "total_attack_ap": 571
+  },
+  {
+    "min_ap": 352,
+    "max_ap": 357,
+    "bonus_ap": 223,
+    "bonus_diff": 3,
+    "total_attack_ap": 580
+  },
+  {
+    "min_ap": 358,
+    "max_ap": 363,
+    "bonus_ap": 225,
+    "bonus_diff": 2,
+    "total_attack_ap": 588
+  },
+  {
+    "min_ap": 364,
+    "max_ap": 368,
+    "bonus_ap": 227,
+    "bonus_diff": 2,
+    "total_attack_ap": 595
+  },
+  {
+    "min_ap": 369,
+    "max_ap": 374,
+    "bonus_ap": 230,
+    "bonus_diff": 3,
+    "total_attack_ap": 604
+  },
+  {
+    "min_ap": 375,
+    "max_ap": 380,
+    "bonus_ap": 233,
+    "bonus_diff": 3,
+    "total_attack_ap": 613
+  },
+  {
+    "min_ap": 381,
+    "max_ap": 385,
+    "bonus_ap": 236,
+    "bonus_diff": 3,
+    "total_attack_ap": 621
+  },
+  {
+    "min_ap": 386,
+    "max_ap": 391,
+    "bonus_ap": 239,
+    "bonus_diff": 3,
+    "total_attack_ap": 630
+  },
+  {
+    "min_ap": 392,
+    "max_ap": 396,
+    "bonus_ap": 242,
+    "bonus_diff": 3,
+    "total_attack_ap": 638
+  },
+  {
+    "min_ap": 397,
+    "max_ap": 398,
+    "bonus_ap": 245,
+    "bonus_diff": 3,
+    "total_attack_ap": 643
+  },
+  {
+    "min_ap": 399,
+    "max_ap": 400,
+    "bonus_ap": 247,
+    "bonus_diff": 2,
+    "total_attack_ap": 647
+  },
+  {
+    "min_ap": 401,
+    "max_ap": 402,
+    "bonus_ap": 249,
+    "bonus_diff": 2,
+    "total_attack_ap": 651
+  },
+  {
+    "min_ap": 403,
+    "max_ap": 404,
+    "bonus_ap": 251,
+    "bonus_diff": 2,
+    "total_attack_ap": 655
+  },
+  {
+    "min_ap": 405,
+    "max_ap": 406,
+    "bonus_ap": 253,
+    "bonus_diff": 2,
+    "total_attack_ap": 659
+  },
+  {
+    "min_ap": 407,
+    "max_ap": 408,
+    "bonus_ap": 255,
+    "bonus_diff": 2,
+    "total_attack_ap": 663
+  },
+  {
+    "min_ap": 409,
+    "max_ap": 410,
+    "bonus_ap": 257,
+    "bonus_diff": 2,
+    "total_attack_ap": 667
+  },
+  {
+    "min_ap": 411,
+    "max_ap": 412,
+    "bonus_ap": 259,
+    "bonus_diff": 2,
+    "total_attack_ap": 671
+  },
+  {
+    "min_ap": 413,
+    "max_ap": 414,
+    "bonus_ap": 261,
+    "bonus_diff": 2,
+    "total_attack_ap": 675
+  },
+  {
+    "min_ap": 415,
+    "max_ap": 416,
+    "bonus_ap": 263,
+    "bonus_diff": 2,
+    "total_attack_ap": 679
+  },
+  {
+    "min_ap": 417,
+    "max_ap": 418,
+    "bonus_ap": 265,
+    "bonus_diff": 2,
+    "total_attack_ap": 683
+  },
+  {
+    "min_ap": 419,
+    "max_ap": 420,
+    "bonus_ap": 267,
+    "bonus_diff": 2,
+    "total_attack_ap": 687
+  },
+  {
+    "min_ap": 421,
+    "max_ap": 422,
+    "bonus_ap": 269,
+    "bonus_diff": 2,
+    "total_attack_ap": 691
+  },
+  {
+    "min_ap": 423,
+    "max_ap": 424,
+    "bonus_ap": 271,
+    "bonus_diff": 2,
+    "total_attack_ap": 695
+  },
+  {
+    "min_ap": 425,
+    "max_ap": 426,
+    "bonus_ap": 273,
+    "bonus_diff": 2,
+    "total_attack_ap": 699
+  },
+  {
+    "min_ap": 427,
+    "max_ap": 428,
+    "bonus_ap": 275,
+    "bonus_diff": 2,
+    "total_attack_ap": 703
+  },
+  {
+    "min_ap": 429,
+    "max_ap": 430,
+    "bonus_ap": 277,
+    "bonus_diff": 2,
+    "total_attack_ap": 707
+  },
+  {
+    "min_ap": 431,
+    "max_ap": 432,
+    "bonus_ap": 279,
+    "bonus_diff": 2,
+    "total_attack_ap": 711
+  },
+  {
+    "min_ap": 433,
+    "max_ap": 434,
+    "bonus_ap": 281,
+    "bonus_diff": 2,
+    "total_attack_ap": 715
+  },
+  {
+    "min_ap": 435,
+    "max_ap": 436,
+    "bonus_ap": 283,
+    "bonus_diff": 2,
+    "total_attack_ap": 719
+  },
+  {
+    "min_ap": 437,
+    "max_ap": 438,
+    "bonus_ap": 285,
+    "bonus_diff": 2,
+    "total_attack_ap": 723
+  },
+  {
+    "min_ap": 439,
+    "max_ap": 440,
+    "bonus_ap": 287,
+    "bonus_diff": 2,
+    "total_attack_ap": 727
+  },
+  {
+    "min_ap": 441,
+    "max_ap": 442,
+    "bonus_ap": 289,
+    "bonus_diff": 2,
+    "total_attack_ap": 731
+  },
+  {
+    "min_ap": 443,
+    "max_ap": 444,
+    "bonus_ap": 291,
+    "bonus_diff": 2,
+    "total_attack_ap": 735
+  },
+  {
+    "min_ap": 445,
+    "max_ap": 446,
+    "bonus_ap": 293,
+    "bonus_diff": 2,
+    "total_attack_ap": 739
+  },
+  {
+    "min_ap": 447,
+    "max_ap": 448,
+    "bonus_ap": 295,
+    "bonus_diff": 2,
+    "total_attack_ap": 743
+  },
+  {
+    "min_ap": 449,
+    "max_ap": 450,
+    "bonus_ap": 297,
+    "bonus_diff": 2,
+    "total_attack_ap": 747
+  },
+  {
+    "min_ap": 451,
+    "max_ap": 452,
+    "bonus_ap": 299,
+    "bonus_diff": 2,
+    "total_attack_ap": 751
+  },
+  {
+    "min_ap": 453,
+    "max_ap": 454,
+    "bonus_ap": 301,
+    "bonus_diff": 2,
+    "total_attack_ap": 755
+  },
+  {
+    "min_ap": 455,
+    "max_ap": 456,
+    "bonus_ap": 303,
+    "bonus_diff": 2,
+    "total_attack_ap": 759
+  },
+  {
+    "min_ap": 457,
+    "max_ap": 458,
+    "bonus_ap": 305,
+    "bonus_diff": 2,
+    "total_attack_ap": 763
+  },
+  {
+    "min_ap": 459,
+    "max_ap": 460,
+    "bonus_ap": 307,
+    "bonus_diff": 2,
+    "total_attack_ap": 767
+  },
+  {
+    "min_ap": 461,
+    "max_ap": 462,
+    "bonus_ap": 309,
+    "bonus_diff": 2,
+    "total_attack_ap": 771
+  },
+  {
+    "min_ap": 463,
+    "max_ap": 464,
+    "bonus_ap": 311,
+    "bonus_diff": 2,
+    "total_attack_ap": 775
+  },
+  {
+    "min_ap": 465,
+    "max_ap": 466,
+    "bonus_ap": 313,
+    "bonus_diff": 2,
+    "total_attack_ap": 779
+  },
+  {
+    "min_ap": 467,
+    "max_ap": 468,
+    "bonus_ap": 315,
+    "bonus_diff": 2,
+    "total_attack_ap": 783
+  },
+  {
+    "min_ap": 469,
+    "max_ap": 470,
+    "bonus_ap": 317,
+    "bonus_diff": 2,
+    "total_attack_ap": 787
+  },
+  {
+    "min_ap": 471,
+    "max_ap": 472,
+    "bonus_ap": 319,
+    "bonus_diff": 2,
+    "total_attack_ap": 791
+  },
+  {
+    "min_ap": 473,
+    "max_ap": 474,
+    "bonus_ap": 321,
+    "bonus_diff": 2,
+    "total_attack_ap": 795
+  },
+  {
+    "min_ap": 475,
+    "max_ap": 476,
+    "bonus_ap": 323,
+    "bonus_diff": 2,
+    "total_attack_ap": 799
+  },
+  {
+    "min_ap": 477,
+    "max_ap": 478,
+    "bonus_ap": 325,
+    "bonus_diff": 2,
+    "total_attack_ap": 803
+  },
+  {
+    "min_ap": 479,
+    "max_ap": 480,
+    "bonus_ap": 327,
+    "bonus_diff": 2,
+    "total_attack_ap": 807
+  },
+  {
+    "min_ap": 481,
+    "max_ap": 482,
+    "bonus_ap": 329,
+    "bonus_diff": 2,
+    "total_attack_ap": 811
+  },
+  {
+    "min_ap": 483,
+    "max_ap": 484,
+    "bonus_ap": 331,
+    "bonus_diff": 2,
+    "total_attack_ap": 815
+  },
+  {
+    "min_ap": 485,
+    "max_ap": 486,
+    "bonus_ap": 333,
+    "bonus_diff": 2,
+    "total_attack_ap": 819
+  },
+  {
+    "min_ap": 487,
+    "max_ap": 488,
+    "bonus_ap": 335,
+    "bonus_diff": 2,
+    "total_attack_ap": 823
+  },
+  {
+    "min_ap": 489,
+    "max_ap": 490,
+    "bonus_ap": 337,
+    "bonus_diff": 2,
+    "total_attack_ap": 827
+  },
+  {
+    "min_ap": 491,
+    "max_ap": 492,
+    "bonus_ap": 339,
+    "bonus_diff": 2,
+    "total_attack_ap": 831
+  },
+  {
+    "min_ap": 493,
+    "max_ap": 494,
+    "bonus_ap": 341,
+    "bonus_diff": 2,
+    "total_attack_ap": 835
+  },
+  {
+    "min_ap": 495,
+    "max_ap": 496,
+    "bonus_ap": 343,
+    "bonus_diff": 2,
+    "total_attack_ap": 839
+  },
+  {
+    "min_ap": 497,
+    "max_ap": 498,
+    "bonus_ap": 345,
+    "bonus_diff": 2,
+    "total_attack_ap": 843
+  },
+  {
+    "min_ap": 499,
+    "max_ap": 500,
+    "bonus_ap": 347,
+    "bonus_diff": 2,
+    "total_attack_ap": 847
+  }
+]
